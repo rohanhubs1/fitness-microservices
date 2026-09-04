@@ -1,0 +1,35 @@
+﻿# Environment & Secrets (NEVER COMMIT REAL CREDENTIALS)
+.env
+*.local
+*.secret
+
+# Maven / Java Build Outputs
+**/target/
+*.jar
+*.war
+*.ear
+*.class
+.mvn/wrapper/maven-wrapper.jar
+
+# Frontend / Node Outputs
+**/node_modules/
+**/dist/
+**/build/
+.npm
+*.log
+
+# IDE & OS Artifacts
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+.DS_Store
+Thumbs.db
+
+# Docker Data & Scratch
+keycloak_data/
+rabbitmq_data/
+scratch/
+.system_generated/

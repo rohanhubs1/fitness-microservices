@@ -1,0 +1,225 @@
+name: pulseforge
+
+services:
+  # ==============================================================================
+  # IDENTITY & ACCESS MANAGEMENT (KEYCLOAK)
+  # ==============================================================================
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.7.1
+    container_name: pulseforge-keycloak
+    command: start-dev --http-port=8181
+    restart: unless-stopped
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KC_HEALTH_ENABLED: "true"
+    ports:
+      - "8181:8181"
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    networks:
+      - pulseforge-net
+
+  # ==============================================================================
+  # MESSAGE BROKER (RABBITMQ)
+  # ==============================================================================
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: pulseforge-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - pulseforge-net
+
+  # ==============================================================================
+  # SERVICE DISCOVERY & CONFIGURATION
+  # ==============================================================================
+  eureka:
+    build:
+      context: ./eureka
+      dockerfile: Dockerfile
+    image: pulseforge/eureka:latest
+    container_name: pulseforge-eureka
+    restart: unless-stopped
+    ports:
+      - "${EUREKA_PORT:-8761}:8761"
+    environment:
+      SPRING_APPLICATION_NAME: eureka
+      SERVER_PORT: 8761
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: "false"
+      EUREKA_CLIENT_FETCH_REGISTRY: "false"
+    networks:
+      - pulseforge-net
+
+  config-server:
+    build:
+      context: ./configServer
+      dockerfile: Dockerfile
+    image: pulseforge/config-server:latest
+    container_name: pulseforge-config-server
+    restart: unless-stopped
+    ports:
+      - "${CONFIG_SERVER_PORT:-8888}:8888"
+    environment:
+      SPRING_PROFILES_ACTIVE: native
+      SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCH_LOCATIONS: classpath:/config
+      EUREKA_SERVER_URL: http://eureka:8761/eureka/
+    depends_on:
+      - eureka
+    networks:
+      - pulseforge-net
+
+  # ==============================================================================
+  # CORE BACKEND MICROSERVICES (CLOUD DATABASE POWERED)
+  # ==============================================================================
+  user-service:
+    build:
+      context: ./userService
+      dockerfile: Dockerfile
+    image: pulseforge/user-service:latest
+    container_name: pulseforge-user-service
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      CONFIG_SERVER_URL: http://config-server:8888
+      EUREKA_SERVER_URL: http://eureka:8761/eureka/
+      POSTGRES_URL: ${POSTGRES_URL}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - config-server
+      - eureka
+    networks:
+      - pulseforge-net
+
+  activity-service:
+    build:
+      context: ./activityService
+      dockerfile: Dockerfile
+    image: pulseforge/activity-service:latest
+    container_name: pulseforge-activity-service
+    restart: unless-stopped
+    ports:
+      - "8082:8082"
+    environment:
+      CONFIG_SERVER_URL: http://config-server:8888
+      EUREKA_SERVER_URL: http://eureka:8761/eureka/
+      MONGO_URI_ACTIVITY: ${MONGO_URI_ACTIVITY}
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USERNAME:-guest}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME:-guest}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - config-server
+      - eureka
+      - rabbitmq
+    networks:
+      - pulseforge-net
+
+  ai-service:
+    build:
+      context: ./aiService
+      dockerfile: Dockerfile
+    image: pulseforge/ai-service:latest
+    container_name: pulseforge-ai-service
+    restart: unless-stopped
+    ports:
+      - "8083:8083"
+    environment:
+      CONFIG_SERVER_URL: http://config-server:8888
+      EUREKA_SERVER_URL: http://eureka:8761/eureka/
+      MONGO_URI_AI: ${MONGO_URI_AI}
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USERNAME:-guest}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME:-guest}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+      GROK_API_URL: ${GROK_API_URL}
+      GROK_API_KEY: ${GROK_API_KEY}
+      GROK_MODEL: ${GROK_MODEL:-llama-3.3-70b-versatile}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - config-server
+      - eureka
+      - rabbitmq
+    networks:
+      - pulseforge-net
+
+  # ==============================================================================
+  # API GATEWAY
+  # ==============================================================================
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    image: pulseforge/gateway:latest
+    container_name: pulseforge-gateway
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      CONFIG_SERVER_URL: http://config-server:8888
+      EUREKA_SERVER_URL: http://eureka:8761/eureka/
+      KEYCLOAK_JWK_SET_URI: ${KEYCLOAK_JWK_SET_URI}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - config-server
+      - eureka
+      - user-service
+      - activity-service
+      - ai-service
+    networks:
+      - pulseforge-net
+
+  # ==============================================================================
+  # FRONTEND (REACT + VITE + NGINX)
+  # ==============================================================================
+  frontend:
+    build:
+      context: ./fitness-app-frontend
+      dockerfile: Dockerfile
+    image: pulseforge/frontend:latest
+    container_name: pulseforge-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8080/api}
+      VITE_KEYCLOAK_URL: ${VITE_KEYCLOAK_URL:-http://localhost:8181}
+    depends_on:
+      - gateway
+    networks:
+      - pulseforge-net
+
+# ==============================================================================
+# NETWORKS
+# ==============================================================================
+networks:
+  pulseforge-net:
+    driver: bridge
+
+volumes:
+  keycloak_data:
+  rabbitmq_data:
+
