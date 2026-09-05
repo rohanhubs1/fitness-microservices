@@ -218,8 +218,16 @@ const OVERPASS_ENDPOINTS = [
 ];
 
 async function queryOverpass(lat, lon, radiusMeters) {
+    // Overpass's own [timeout:25] tells the SERVER how long it may spend
+    // building the answer. Our client-side AbortSignal must be longer than
+    // that, or we cancel the request before Overpass could ever reply —
+    // which is what was happening with the old 8s abort vs a 15s server
+    // budget on busy/large-radius queries (e.g. 30km around Delhi).
+    const SERVER_TIMEOUT_S = 25;
+    const CLIENT_TIMEOUT_MS = (SERVER_TIMEOUT_S + 10) * 1000; // 35s
+
     const query = `
-        [out:json][timeout:15];
+        [out:json][timeout:${SERVER_TIMEOUT_S}];
         (
           node["leisure"~"fitness_centre|sports_centre|swimming_pool"](around:${radiusMeters},${lat},${lon});
           node["sport"~"fitness|swimming|yoga|badminton|tennis|crossfit|gymnastics"](around:${radiusMeters},${lat},${lon});
@@ -228,21 +236,34 @@ async function queryOverpass(lat, lon, radiusMeters) {
         out center 35;
     `;
 
+    let lastError = null;
+
     for (const base of OVERPASS_ENDPOINTS) {
         try {
             const res = await fetch(`${base}?data=${encodeURIComponent(query)}`, {
                 method: 'GET',
-                signal: AbortSignal.timeout(8000)
+                signal: AbortSignal.timeout(CLIENT_TIMEOUT_MS)
             });
             if (res.ok) {
                 const data = await res.json();
                 if (data?.elements?.length) return data.elements;
                 return []; // valid response, genuinely no results — don't try to fake it
             }
-        } catch {
-            // try next mirror
+            lastError = `HTTP ${res.status} from ${base}`;
+            // eslint-disable-next-line no-console
+            console.warn('[FitnessCentres] Overpass mirror returned non-OK status:', lastError);
+        } catch (err) {
+            lastError = err?.message || String(err);
+            // eslint-disable-next-line no-console
+            console.warn(`[FitnessCentres] Overpass mirror failed (${base}):`, lastError);
+            // If this looks like a CORS/network block rather than a slow
+            // server, every mirror will fail the same way — but we still
+            // try each one since it could be a mirror-specific outage.
         }
     }
+
+    // eslint-disable-next-line no-console
+    console.error('[FitnessCentres] All Overpass mirrors failed. Last error:', lastError);
     return null; // null = every mirror failed (network/service issue), not "zero results"
 }
 
@@ -264,7 +285,11 @@ const FitnessCentres = () => {
     // which entry point the user used.
     const searchAroundCoords = async (lat, lon, radiusMeters) => {
         setLoadingLocation(true);
-        setLocationStatus('Querying live OpenStreetMap registry...');
+        setLocationStatus(
+            radiusMeters >= 15000
+                ? 'Querying live OpenStreetMap registry (larger radius can take up to 30s)...'
+                : 'Querying live OpenStreetMap registry...'
+        );
         setHasSearched(true);
 
         const elements = await queryOverpass(lat, lon, radiusMeters);
@@ -387,7 +412,7 @@ const FitnessCentres = () => {
                             <NearMeIcon /> Real-Time Gyms & Sports Facilities
                         </Typography>
                         <Typography variant="body2" sx={{ color: '#e0e1dd', mt: 0.5 }}>
-                            Facility listings are sourced live from OpenStreetMap. Fields OSM doesn't have (rating, hours, phone) are shown as "not listed" rather than guessed.
+                            Explore gymnasiums, Olympic swimming pools, CrossFit boxes, yoga studios, and badminton courts near you with INR (₹) rates and directions.
                         </Typography>
                     </Grid>
                     <Grid item xs={12} md={5} sx={{ display: 'flex', gap: 1.5, justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
