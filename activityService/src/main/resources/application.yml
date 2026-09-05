@@ -11,7 +11,7 @@ spring:
     uri: ${MONGO_URI_ACTIVITY:${MONGO_URI:mongodb://localhost:27017/fitness}}
 
   rabbitmq:
-    addresses: ${RABBITMQ_URL:}
+    addresses: ${CLOUDAMQP_URL:${RABBITMQ_URL:${SPRING_RABBITMQ_ADDRESSES:${SPRING_RABBITMQ_URI:}}}}
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USERNAME:guest}
