@@ -240,8 +240,10 @@ async function queryOverpass(lat, lon, radiusMeters) {
 
     for (const base of OVERPASS_ENDPOINTS) {
         try {
-            const res = await fetch(`${base}?data=${encodeURIComponent(query)}`, {
-                method: 'GET',
+            const res = await fetch(base, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `data=${encodeURIComponent(query)}`,
                 signal: AbortSignal.timeout(CLIENT_TIMEOUT_MS)
             });
             if (res.ok) {
