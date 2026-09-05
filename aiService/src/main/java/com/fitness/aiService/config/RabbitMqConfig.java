@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@lombok.extern.slf4j.Slf4j
 public class RabbitMqConfig {
 
     @Value("${rabbitmq.exchange.name:fitness.exchange}")
@@ -31,7 +32,7 @@ public class RabbitMqConfig {
     @Value("${rabbitmq.dlx.queue.name:activity.queue.dlq}")
     private String dlqQueue;
 
-    @Value("${spring.rabbitmq.addresses:${CLOUDAMQP_URL:${RABBITMQ_URL:${SPRING_RABBITMQ_ADDRESSES:${SPRING_RABBITMQ_URI:}}}}}")
+    @Value("${spring.rabbitmq.addresses:${CLOUDAMQP_URL:${RABBITMQ_URL:${Rabbitmq_url:${rabbitmq_url:${SPRING_RABBITMQ_ADDRESSES:${SPRING_RABBITMQ_URI:}}}}}}}")
     private String rabbitmqUrl;
 
     @Value("${spring.rabbitmq.host:localhost}")
@@ -49,23 +50,23 @@ public class RabbitMqConfig {
     @Value("${spring.rabbitmq.virtual-host:/}")
     private String rabbitmqVirtualHost;
 
+    private String resolveUrl() {
+        if (rabbitmqUrl != null && !rabbitmqUrl.isBlank()) return rabbitmqUrl.trim();
+        for (String key : new String[]{"CLOUDAMQP_URL", "Cloudamqp_url", "cloudamqp_url", "RABBITMQ_URL", "Rabbitmq_url", "rabbitmq_url", "SPRING_RABBITMQ_ADDRESSES", "SPRING_RABBITMQ_URI"}) {
+            String val = System.getenv(key);
+            if (val != null && !val.isBlank()) return val.trim();
+        }
+        return null;
+    }
+
     @Bean
     public ConnectionFactory connectionFactory() {
-        String url = rabbitmqUrl;
-        if (url == null || url.isBlank()) {
-            url = System.getenv("CLOUDAMQP_URL");
-        }
-        if (url == null || url.isBlank()) {
-            url = System.getenv("RABBITMQ_URL");
-        }
-        if (url == null || url.isBlank()) {
-            url = System.getenv("SPRING_RABBITMQ_ADDRESSES");
-        }
+        String url = resolveUrl();
 
         if (url != null && !url.isBlank() && (url.startsWith("amqp://") || url.startsWith("amqps://"))) {
             try {
                 com.rabbitmq.client.ConnectionFactory rcf = new com.rabbitmq.client.ConnectionFactory();
-                rcf.setUri(url.trim());
+                rcf.setUri(url);
                 org.springframework.amqp.rabbit.connection.CachingConnectionFactory factory =
                         new org.springframework.amqp.rabbit.connection.CachingConnectionFactory(rcf);
                 factory.setUsername(rcf.getUsername());
@@ -73,15 +74,20 @@ public class RabbitMqConfig {
                 factory.setVirtualHost(rcf.getVirtualHost());
                 factory.setHost(rcf.getHost());
                 factory.setPort(rcf.getPort());
+                log.info("Initialized CloudAMQP ConnectionFactory -> host: {}, port: {}, vhost: {}, user: {}",
+                        factory.getHost(), factory.getPort(), factory.getVirtualHost(), factory.getUsername());
                 return factory;
             } catch (Exception e) {
+                log.error("Failed to parse RabbitMQ URI: {}", e.getMessage());
                 org.springframework.amqp.rabbit.connection.CachingConnectionFactory factory =
                         new org.springframework.amqp.rabbit.connection.CachingConnectionFactory();
-                factory.setUri(url.trim());
+                factory.setUri(url);
                 return factory;
             }
         }
 
+        log.info("Initializing fallback RabbitMQ ConnectionFactory -> host: {}, port: {}, user: {}",
+                rabbitmqHost, rabbitmqPort, rabbitmqUsername);
         org.springframework.amqp.rabbit.connection.CachingConnectionFactory factory =
                 new org.springframework.amqp.rabbit.connection.CachingConnectionFactory(rabbitmqHost, rabbitmqPort);
         factory.setUsername(rabbitmqUsername);
