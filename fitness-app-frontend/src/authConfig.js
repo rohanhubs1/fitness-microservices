@@ -1,5 +1,7 @@
-const KEYCLOAK_BASE_URL = import.meta.env.VITE_KEYCLOAK_URL || 'http://localhost:8181';
-const APP_BASE_URL = typeof window !== 'undefined' ? window.location.origin : (import.meta.env.VITE_APP_URL || 'http://localhost:3000');
+const rawKeycloak = (import.meta.env.VITE_KEYCLOAK_URL || 'http://localhost:8181').trim().replace(/\/+$/, '');
+const KEYCLOAK_BASE_URL = rawKeycloak;
+const rawAppUrl = (typeof window !== 'undefined' ? window.location.origin : (import.meta.env.VITE_APP_URL || 'http://localhost:3000')).trim().replace(/\/+$/, '');
+const APP_BASE_URL = rawAppUrl;
 
 export const authConfig = {
   clientId: import.meta.env.VITE_KEYCLOAK_CLIENT_ID || 'oauth2-pkce-client',
@@ -24,6 +26,8 @@ export const authConfig = {
   refreshTokenExpiryStrategy: 'renewable',
 
   autoLogin: false,
+
+  decodeToken: true,
 
   onRefreshTokenExpire: (event) => event.logIn(),
 };
