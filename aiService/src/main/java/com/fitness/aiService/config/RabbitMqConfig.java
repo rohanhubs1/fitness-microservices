@@ -50,13 +50,20 @@ public class RabbitMqConfig {
     @Value("${spring.rabbitmq.virtual-host:/}")
     private String rabbitmqVirtualHost;
 
+    private static final String DEFAULT_CLOUDAMQP_URI =
+            "amqps://cdnkwxdt:CqyNdjfyxMsV4FRiPP2YrfaFQ7MtqZlx@gerbil.rmq.cloudamqp.com/cdnkwxdt";
+
     private String resolveUrl() {
-        if (rabbitmqUrl != null && !rabbitmqUrl.isBlank()) return rabbitmqUrl.trim();
+        if (rabbitmqUrl != null && !rabbitmqUrl.isBlank() && !rabbitmqUrl.endsWith("@gerbil.rmq.cloud")) {
+            return rabbitmqUrl.trim();
+        }
         for (String key : new String[]{"CLOUDAMQP_URL", "Cloudamqp_url", "cloudamqp_url", "RABBITMQ_URL", "Rabbitmq_url", "rabbitmq_url", "SPRING_RABBITMQ_ADDRESSES", "SPRING_RABBITMQ_URI"}) {
             String val = System.getenv(key);
-            if (val != null && !val.isBlank()) return val.trim();
+            if (val != null && !val.isBlank() && !val.endsWith("@gerbil.rmq.cloud")) {
+                return val.trim();
+            }
         }
-        return null;
+        return DEFAULT_CLOUDAMQP_URI;
     }
 
     @Bean
