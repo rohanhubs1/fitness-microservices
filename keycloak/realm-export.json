@@ -45,16 +45,20 @@
         "http://localhost:3000/*",
         "http://localhost:3000/",
         "http://localhost:5173/*",
-        "http://localhost:5173/"
+        "http://localhost:5173/",
+        "https://*.vercel.app/*",
+        "https://*.vercel.app/"
       ],
       "webOrigins": [
         "http://localhost:3000",
         "http://localhost:5173",
-        "+"
+        "https://*.vercel.app",
+        "+",
+        "*"
       ],
       "attributes": {
         "pkce.code.challenge.method": "S256",
-        "post.logout.redirect.uris": "http://localhost:3000/*##http://localhost:5173/*"
+        "post.logout.redirect.uris": "http://localhost:3000/*##http://localhost:5173/*##https://*.vercel.app/*"
       }
     }
   ]
