@@ -42,19 +42,33 @@
       "frontchannelLogout": true,
       "fullScopeAllowed": true,
       "redirectUris": [
-        "*",
+        "https://*.vercel.app/*",
+        "https://*.vercel.app",
+        "https://*-rohan-hubs.vercel.app/*",
+        "https://*-rohan-hubs.vercel.app",
+        "https://fitness-microservices-l5r4p1vcf-rohan-hubs.vercel.app/*",
+        "https://fitness-microservices-l5r4p1vcf-rohan-hubs.vercel.app",
+        "https://fitness-microservices.vercel.app/*",
+        "https://fitness-microservices.vercel.app",
         "http://localhost:3000/*",
         "http://localhost:3000/",
         "http://localhost:5173/*",
-        "http://localhost:5173/"
+        "http://localhost:5173/",
+        "*"
       ],
       "webOrigins": [
-        "*",
-        "+"
+        "https://*.vercel.app",
+        "https://*-rohan-hubs.vercel.app",
+        "https://fitness-microservices-l5r4p1vcf-rohan-hubs.vercel.app",
+        "https://fitness-microservices.vercel.app",
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "+",
+        "*"
       ],
       "attributes": {
         "pkce.code.challenge.method": "S256",
-        "post.logout.redirect.uris": "*##http://localhost:3000/*##http://localhost:5173/*"
+        "post.logout.redirect.uris": "https://*.vercel.app/*##http://localhost:3000/*##http://localhost:5173/*##*"
       }
     }
   ],
