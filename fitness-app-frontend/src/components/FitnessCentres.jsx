@@ -219,24 +219,21 @@ const FitnessCentres = () => {
 
         try {
             const endpoints = [
-                'https://overpass-api.de/api/interpreter',
-                'https://overpass.kumi.systems/api/interpreter'
+                `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`,
+                `https://lz4.overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`,
+                `https://overpass.kumi.systems/api/interpreter?data=${encodeURIComponent(query)}`
             ];
 
             let data = null;
             for (const ep of endpoints) {
                 try {
-                    const res = await fetch(ep, {
-                        method: 'POST',
-                        body: `data=${encodeURIComponent(query)}`,
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-                    });
+                    const res = await fetch(ep, { method: 'GET', signal: AbortSignal.timeout(6000) });
                     if (res.ok) {
                         data = await res.json();
                         if (data?.elements && data.elements.length > 0) break;
                     }
-                } catch (e) {
-                    // Try next endpoint mirror
+                } catch {
+                    // Try next mirror gracefully without throwing unhandled rejection
                 }
             }
 
