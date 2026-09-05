@@ -15,9 +15,47 @@ public class UserController {
 
     private final UserService userService;
 
+    @GetMapping("/profile")
+    public ResponseEntity<UserResponse> getProfile(@RequestHeader(value = "X-User-ID", required = false) String userId) {
+        return ResponseEntity.ok(userService.getUserProfile(userId));
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<UserResponse> updateProfile(
+            @RequestHeader(value = "X-User-ID", required = false) String userId,
+            @RequestBody com.fitness.userService.dto.UserProfileUpdateRequest request) {
+        return ResponseEntity.ok(userService.updateProfile(userId, request));
+    }
+
     @GetMapping("/{userId}")
     public ResponseEntity<UserResponse> getUserProfile(@PathVariable String userId){
         return ResponseEntity.ok(userService.getUserProfile(userId));
+    }
+
+    @GetMapping("/admin/all")
+    public ResponseEntity<java.util.List<UserResponse>> getAllUsersAdmin() {
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    @GetMapping("/admin/stats")
+    public ResponseEntity<com.fitness.userService.dto.UserAdminStatsResponse> getAdminStats() {
+        return ResponseEntity.ok(userService.getAdminStats());
+    }
+
+    @PutMapping("/admin/{userId}/deactivate")
+    public ResponseEntity<UserResponse> deactivateUser(@PathVariable String userId) {
+        return ResponseEntity.ok(userService.softDeleteUser(userId));
+    }
+
+    @PutMapping("/admin/{userId}/restore")
+    public ResponseEntity<UserResponse> restoreUser(@PathVariable String userId) {
+        return ResponseEntity.ok(userService.restoreUser(userId));
+    }
+
+    @DeleteMapping("/admin/{userId}/purge")
+    public ResponseEntity<Void> purgeUser(@PathVariable String userId) {
+        userService.hardDeleteUser(userId);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/register")
@@ -29,5 +67,5 @@ public class UserController {
     public ResponseEntity<Boolean> validateUser(@PathVariable String userId){
         return ResponseEntity.ok(userService.existBykeycloakId(userId));
     }
-
 }
+

@@ -133,6 +133,34 @@ public class ActivityAIService {
             suggestions.add("Strength: Add lower body quad and glute resistance exercises.");
             safety.add("Ensure correct saddle height to protect your knees and lower back.");
             safety.add("Drink water consistently every 15-20 minutes during prolonged rides.");
+        } else if ("SWIMMING".equalsIgnoreCase(type)) {
+            improvements.add("Stroke Efficiency: Focus on a high-elbow catch and bilateral breathing to reduce drag.");
+            improvements.add("Kick Rhythm: Maintain a steady 2-beat kick for distance conservation or 6-beat kick for speed.");
+            suggestions.add("Next Workout: 5x100m interval drills with 20 seconds rest between sets.");
+            suggestions.add("Dryland Training: Shoulder rotator cuff band exercises and lat pull downs.");
+            safety.add("Warm up shoulder joints dynamically before entering the pool.");
+            safety.add("Rehydrate post-swim—fluid loss is often masked in the water.");
+        } else if ("WEIGHT_TRAINING".equalsIgnoreCase(type)) {
+            improvements.add("Progressive Overload: Focus on controlled 3-second eccentric tempo on compound movements.");
+            improvements.add("Rest Periods: Maintain 90-120 seconds rest between heavy sets for full ATP replenishment.");
+            suggestions.add("Next Workout: Target complementary antagonist muscle groups (e.g. Back & Biceps after Chest & Triceps).");
+            suggestions.add("Mobility: 10 minutes of thoracic spine and hip mobility drills.");
+            safety.add("Always use proper bracing and a full range of motion before increasing weight.");
+            safety.add("Consume 20-30g of high-quality protein within 1-2 hours post-session.");
+        } else if ("HIIT".equalsIgnoreCase(type)) {
+            improvements.add("Explosiveness: Maximize power output during the work intervals; do not pace yourself during sprints.");
+            improvements.add("Active Recovery: Keep moving with light stepping during the rest intervals to clear lactic acid.");
+            suggestions.add("Next Workout: Low-impact aerobic recovery session or 30-minute steady-state walking.");
+            suggestions.add("Core Stability: Plank progressions and hollow body holds.");
+            safety.add("Prioritize form over speed when fatigue sets in to prevent injury.");
+            safety.add("Take at least 48 hours before another maximum-intensity HIIT session.");
+        } else if ("YOGA".equalsIgnoreCase(type)) {
+            improvements.add("Breath Sync: Deepen your Ujjayi breath to match movements and lengthen each inhalation/exhalation.");
+            improvements.add("Alignment: Focus on engaging your core and grounding through all four corners of your feet.");
+            suggestions.add("Next Workout: 30-minute Vinyasa flow focusing on hip openers and spinal twists.");
+            suggestions.add("Meditation: 5-10 minutes of mindful breathing in Savasana.");
+            safety.add("Never force a posture or hyperextend joints; use blocks or straps when needed.");
+            safety.add("Listen to your body and modify poses to honor your current range of motion.");
         } else {
             improvements.add("Pacing: Maintain a brisk, purposeful stride to maximize cardiovascular engagement.");
             improvements.add("Posture: Keep an upright posture with active arm swing to increase upper body calorie burn.");
@@ -202,46 +230,46 @@ public class ActivityAIService {
 
     private String createPromptForActivity(Activity activity) {
         return String.format("""
-        Analyze this fitness activity and provide detailed recommendations.
+        You are an elite, world-class Sports Scientist and Master AI Fitness Coach.
+        Analyze this workout session with deep biomechanical, physiological, and training precision.
 
         Activity Type: %s
         Duration: %d minutes
         Calories Burned: %d
-        Additional Metrics: %s
+        Dynamic Workout Metrics: %s
 
-        Focus on:
-        - Overall performance
-        - Pace
-        - Heart rate
-        - Calories
-        - Improvements
-        - Next workout suggestions
-        - Safety guidelines
+        Specialized Domain Instructions:
+        - If WEIGHT_TRAINING: Analyze muscle group targeted, volume load (sets x reps), peak working weight, progressive overload cues, hypertrophy stimulation, rest intervals, and protein synthesis recovery.
+        - If SWIMMING: Analyze stroke technique, lap cadence, aerobic threshold, drag reduction, and shoulder joint preservation.
+        - If RUNNING or CYCLING: Analyze cardiovascular pace, distance efficiency, incline resistance / speed, cadence, and tendon recovery.
+        - If HIIT: Analyze EPOC (Excess Post-Exercise Oxygen Consumption) afterburn effect, explosive interval power, and autonomic nervous system balance.
+        - If YOGA: Analyze mobility gains, core engagement, breath synchronization, and parasympathetic recovery.
 
+        Provide actionable, motivating, and science-backed feedback.
         Return the response in EXACTLY this JSON format:
 
         {
           "analysis": {
-            "overall": "Overall analysis here",
-            "pace": "Pace analysis here",
-            "heartRate": "Heart rate analysis here",
-            "caloriesBurned": "Calories analysis here"
+            "overall": "High-impact scientific overview of the session",
+            "pace": "Pacing / Intensity / Effort analysis",
+            "heartRate": "Estimated heart rate zone and energy system targeted",
+            "caloriesBurned": "Metabolic expenditure and energy deficit insight"
           },
           "improvements": [
             {
-              "area": "Area name",
-              "recommendation": "Detailed recommendation"
+              "area": "Technique / Intensity / Volume",
+              "recommendation": "Precise, actionable cue to optimize performance"
             }
           ],
           "suggestions": [
             {
-              "workout": "Workout name",
-              "description": "Detailed workout description"
+              "workout": "Recommended Next Workout",
+              "description": "Specific session to balance recovery and progress"
             }
           ],
           "safety": [
-            "Safety point 1",
-            "Safety point 2"
+            "Critical safety, form, or joint protection cue",
+            "Hydration and recovery guideline"
           ]
         }
         """,

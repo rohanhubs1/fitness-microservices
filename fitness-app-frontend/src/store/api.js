@@ -62,7 +62,30 @@ api.interceptors.request.use((config) => {
 export const getActivities = () => api.get('/activities');
 export const getActivity = (id) => api.get(`/activities/${id}`);
 export const addActivity = (activity) => api.post('/activities', activity);
+export const deleteActivity = (id) => api.delete(`/activities/${id}`);
+export const getActivityStats = () => api.get('/activities/stats');
 export const getActivityDetail = (id) => api.get(`/recommendations/activity/${id}`);
 export const getActivityRecommendation = (id) => api.get(`/recommendations/activity/${id}`);
+export const getUserProfile = () => api.get('/users/profile');
+export const updateUserProfile = (data) => api.put('/users/profile', data);
+export const sendAIChatMessage = (payload) => api.post('/recommendations/chat', payload);
 
+// Admin Control Centre APIs
+export const getAdminUsers = () => api.get('/users/admin/all');
+export const getAdminUserStats = () => api.get('/users/admin/stats');
+export const getAdminActivityStats = () => api.get('/activities/admin/platform-stats');
+export const deactivateUser = (userId) => api.put(`/users/admin/${userId}/deactivate`);
+export const restoreUser = (userId) => api.put(`/users/admin/${userId}/restore`);
+export const purgeUser = (userId) => api.delete(`/users/admin/${userId}/purge`);
 
+// Real-Time Platform Announcements & Contests
+export const getActiveAnnouncement = () => api.get('/announcements/active');
+export const getAllActiveAnnouncements = () => api.get('/announcements/active-all');
+export const getAllAnnouncements = () => api.get('/announcements/all');
+export const publishAnnouncement = (data) => api.post('/announcements', data);
+export const toggleAnnouncement = (id) => api.put(`/announcements/${id}/toggle`);
+export const deleteAnnouncement = (id) => api.delete(`/announcements/${id}`);
+export const clearAnnouncement = () => api.delete('/announcements/active');
+
+// Real-Time Community Leaderboard
+export const getLeaderboard = (period = 'all') => api.get(`/activities/leaderboard?period=${period}`);

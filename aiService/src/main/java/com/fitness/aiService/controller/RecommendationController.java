@@ -1,13 +1,13 @@
 package com.fitness.aiService.controller;
 
+import com.fitness.aiService.dto.ChatRequest;
+import com.fitness.aiService.dto.ChatResponse;
 import com.fitness.aiService.model.Recommendation;
+import com.fitness.aiService.service.AIChatService;
 import com.fitness.aiService.service.RecommendationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -17,6 +17,7 @@ import java.util.List;
 public class RecommendationController {
 
     private final RecommendationService recommendationService;
+    private final AIChatService aiChatService;
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Recommendation>> getUserRecommendation(@PathVariable String userId){
@@ -25,7 +26,13 @@ public class RecommendationController {
 
     @GetMapping("/activity/{activityId}")
     public ResponseEntity<Recommendation> getActivityRecommendation(@PathVariable String activityId){
-        return ResponseEntity.ok(recommendationService.getActivityRecommendation(activityId));
+        return recommendationService.getActivityRecommendation(activityId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/chat")
+    public ResponseEntity<ChatResponse> chatWithAI(@RequestBody ChatRequest request) {
+        return ResponseEntity.ok(aiChatService.processChat(request));
+    }
 }

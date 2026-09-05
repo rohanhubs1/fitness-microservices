@@ -1,101 +1,170 @@
-import { Box, Button, Typography } from "@mui/material";
-import { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "react-oauth2-code-pkce";
 import { useDispatch } from "react-redux";
-import { BrowserRouter as Router, Navigate, Route, Routes, useLocation } from "react-router";
+import { BrowserRouter as Router, Navigate, Route, Routes } from "react-router";
 import { setCredentials } from "./store/authSlice";
-import { useState } from "react";
+import DashboardLayout from "./components/DashboardLayout";
+import LandingPage from "./components/LandingPage";
 import ActivityDetail from "./components/ActivityDetail";
-import ActivityForm from "./components/ActivityForm";
-import ActivityList from "./components/ActivityList";
-
-
-const ActivitiesPage = () => {
-  const [refreshKey, setRefreshKey] = useState(0);
-
-  return (
-    <Box component="section" sx={{ p: 2 }}>
-      <ActivityForm onActivityAdded={() => setRefreshKey(prev => prev + 1)} />
-      <ActivityList key={refreshKey} />
-    </Box>
-  );
-};
+import ProfileDialog from "./components/ProfileDialog";
 
 const App = () => {
-  const {token , tokenData, logIn, logOut, isAuthenticated} = useContext(AuthContext);
+  const { token, tokenData, logIn, logOut } = useContext(AuthContext);
   const dispatch = useDispatch();
-  const [authReady, setAuthReady] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+
   useEffect(() => {
-    if (token){
-      dispatch(setCredentials({token, user: tokenData}));
-      setAuthReady(true);
+    if (token) {
+      dispatch(setCredentials({ token, user: tokenData }));
+      // Clean up OAuth query parameters (?state=... &session_state=...) only after token is established
+      if (typeof window !== 'undefined' && window.location.search && (window.location.search.includes('state=') || window.location.search.includes('session_state='))) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
     }
   }, [token, tokenData, dispatch]);
+
+  const isAdmin = Boolean(
+    tokenData?.realm_access?.roles?.includes('ADMIN') ||
+    tokenData?.resource_access?.['oauth2-pkce-client']?.roles?.includes('ADMIN') ||
+    tokenData?.roles?.includes('ADMIN') ||
+    tokenData?.preferred_username?.toLowerCase() === 'admin'
+  );
+
+  const defaultHome = isAdmin ? "/admin/athletes" : "/dashboard";
 
   return (
     <Router>
       {!token ? (
-        <Box
-        sx={{
-          height: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          textAlign: "center",
-        }}
-        >
-          <Typography variant="h4" gutterBottom>
-            Welcome to the Fitness Tracker App
-          </Typography>
-          <Typography variant="subtitle1" sx={{mb:3}}>
-            Please login to access your activities
-          </Typography>
-      <Button variant="contained" color="primary" size="large" 
-      onClick={() => {
-        logIn()
-      }} >LOGIN</Button>
-      </Box>
-    ) : (
-      // <div>
-      //   <pre>{JSON.stringify(tokenData, null, 2)}</pre>
-      //   <pre>{JSON.stringify(token,null,2)}</pre>
-      // </div>
-  <Box component="section" sx={{ p: 2, border: '1px dashed grey' }}>
+        <LandingPage onLogin={() => logIn()} />
+      ) : (
+        <>
+          <Routes>
+            <Route path="/" element={<Navigate to={defaultHome} replace />} />
+            <Route path="/activities" element={<Navigate to={defaultHome} replace />} />
 
-    <Button
-      variant="contained"
-      onClick={() => logOut()}
-      sx={{ mb: 2 }}
-    >
-      LOGOUT
-    </Button>
+            {/* Athlete Core Pages */}
+            <Route
+              path="/dashboard"
+              element={
+                <DashboardLayout
+                  tokenData={tokenData}
+                  logOut={logOut}
+                  onOpenProfile={() => setProfileOpen(true)}
+                />
+              }
+            />
+            <Route
+              path="/log-workout"
+              element={
+                <DashboardLayout
+                  tokenData={tokenData}
+                  logOut={logOut}
+                  onOpenProfile={() => setProfileOpen(true)}
+                />
+              }
+            />
+            <Route
+              path="/history"
+              element={
+                <DashboardLayout
+                  tokenData={tokenData}
+                  logOut={logOut}
+                  onOpenProfile={() => setProfileOpen(true)}
+                />
+              }
+            />
+            <Route
+              path="/ai-coach"
+              element={
+                <DashboardLayout
+                  tokenData={tokenData}
+                  logOut={logOut}
+                  onOpenProfile={() => setProfileOpen(true)}
+                />
+              }
+            />
+            <Route
+              path="/fitness-centres"
+              element={
+                <DashboardLayout
+                  tokenData={tokenData}
+                  logOut={logOut}
+                  onOpenProfile={() => setProfileOpen(true)}
+                />
+              }
+            />
+            <Route
+              path="/leaderboard"
+              element={
+                <DashboardLayout
+                  tokenData={tokenData}
+                  logOut={logOut}
+                  onOpenProfile={() => setProfileOpen(true)}
+                />
+              }
+            />
+            <Route
+              path="/contests"
+              element={
+                <DashboardLayout
+                  tokenData={tokenData}
+                  logOut={logOut}
+                  onOpenProfile={() => setProfileOpen(true)}
+                />
+              }
+            />
 
-    <Routes>
-      <Route
-        path="/activities"
-        element={<ActivitiesPage />}
-      />
+            {/* Admin Console Pages */}
+            <Route path="/admin" element={<Navigate to="/admin/athletes" replace />} />
+            <Route
+              path="/admin/athletes"
+              element={
+                <DashboardLayout
+                  tokenData={tokenData}
+                  logOut={logOut}
+                  onOpenProfile={() => setProfileOpen(true)}
+                />
+              }
+            />
+            <Route
+              path="/admin/leaderboard"
+              element={
+                <DashboardLayout
+                  tokenData={tokenData}
+                  logOut={logOut}
+                  onOpenProfile={() => setProfileOpen(true)}
+                />
+              }
+            />
+            <Route
+              path="/admin/contests"
+              element={
+                <DashboardLayout
+                  tokenData={tokenData}
+                  logOut={logOut}
+                  onOpenProfile={() => setProfileOpen(true)}
+                />
+              }
+            />
 
-      <Route
-        path="/activities/:id"
-        element={<ActivityDetail />}
-      />
+            {/* Workout Detail & Grok AI Breakdown */}
+            <Route path="/history/:id" element={<ActivityDetail />} />
+            <Route path="/activities/:id" element={<ActivityDetail />} />
 
-      <Route
-        path="/"
-        element={
-          token
-            ? <Navigate to="/activities" replace />
-            : <div>Welcome! Please Login.</div>
-        }
-      />
-    </Routes>
+            {/* Catch-all redirect */}
+            <Route path="*" element={<Navigate to={defaultHome} replace />} />
+          </Routes>
 
-  </Box>
-)}
+          {/* Profile & Goals Modal Dialog */}
+          <ProfileDialog
+            open={profileOpen}
+            onClose={() => setProfileOpen(false)}
+            onProfileUpdated={() => {}}
+          />
+        </>
+      )}
     </Router>
-  )
-}
+  );
+};
 
-export default App
+export default App;

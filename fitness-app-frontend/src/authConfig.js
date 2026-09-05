@@ -19,5 +19,11 @@ export const authConfig = {
 
   scope: 'openid profile email offline_access',
 
+  storage: 'local',
+
+  refreshTokenExpiryStrategy: 'renewable',
+
+  autoLogin: false,
+
   onRefreshTokenExpire: (event) => event.logIn(),
-};
+};

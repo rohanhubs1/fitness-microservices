@@ -155,7 +155,7 @@ services:
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
       GROK_API_URL: ${GROK_API_URL}
       GROK_API_KEY: ${GROK_API_KEY}
-      GROK_MODEL: ${GROK_MODEL:-llama-3.3-70b-versatile}
+      GROK_MODEL: ${GROK_MODEL:-openai/gpt-oss-20b}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
