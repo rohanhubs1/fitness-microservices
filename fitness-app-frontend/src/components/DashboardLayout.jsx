@@ -140,17 +140,26 @@ const DashboardLayout = ({ tokenData, logOut, onOpenProfile }) => {
         }
     }, [refreshKey, isAdmin]);
 
-    const isProfileIncomplete = !isAdmin && userProfileData && (!userProfileData.weight || !userProfileData.height);
+    const isProfileIncomplete = !isAdmin && (!userProfileData || !userProfileData.weight || !userProfileData.height);
 
     const [notificationAnchor, setNotificationAnchor] = useState(null);
     const [readNotificationIds, setReadNotificationIds] = useState(() => {
         try {
-            const saved = localStorage.getItem('pulseforge_read_notifications');
+            const saved = localStorage.getItem(`pulseforge_read_notifications_${username}`);
             return saved ? JSON.parse(saved) : [];
         } catch {
             return [];
         }
     });
+
+    useEffect(() => {
+        try {
+            const saved = localStorage.getItem(`pulseforge_read_notifications_${username}`);
+            setReadNotificationIds(saved ? JSON.parse(saved) : []);
+        } catch {
+            setReadNotificationIds([]);
+        }
+    }, [username]);
 
     // Build real notifications strictly from active platform events
     const allNotifications = isAdmin ? [
@@ -175,7 +184,7 @@ const DashboardLayout = ({ tokenData, logOut, onOpenProfile }) => {
         if (!readNotificationIds.includes(item.id)) {
             const updated = [...readNotificationIds, item.id];
             setReadNotificationIds(updated);
-            localStorage.setItem('pulseforge_read_notifications', JSON.stringify(updated));
+            localStorage.setItem(`pulseforge_read_notifications_${username}`, JSON.stringify(updated));
         }
         if (item.isProfilePrompt && onOpenProfile) {
             onOpenProfile();
@@ -189,7 +198,7 @@ const DashboardLayout = ({ tokenData, logOut, onOpenProfile }) => {
         const allIds = allNotifications.map((n) => n.id);
         const updated = Array.from(new Set([...readNotificationIds, ...allIds]));
         setReadNotificationIds(updated);
-        localStorage.setItem('pulseforge_read_notifications', JSON.stringify(updated));
+        localStorage.setItem(`pulseforge_read_notifications_${username}`, JSON.stringify(updated));
     };
 
     const username = tokenData?.preferred_username || tokenData?.name || (isAdmin ? 'Platform Admin' : 'Athlete');
