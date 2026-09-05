@@ -61,5 +61,65 @@
         "post.logout.redirect.uris": "http://localhost:3000/*##http://localhost:5173/*##https://*.vercel.app/*"
       }
     }
+  ],
+  "users": [
+    {
+      "id": "1fcdd647-abbd-4937-9ba9-6991ae2b859b",
+      "username": "admin",
+      "email": "admin@pulseforge.ai",
+      "firstName": "System",
+      "lastName": "Admin",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "admin",
+        "user"
+      ]
+    },
+    {
+      "id": "85bbbc8c-5b88-4582-ab00-4cb2756e3b98",
+      "username": "player",
+      "email": "iconicplayer9675@gmail.com",
+      "firstName": "Player",
+      "lastName": "Iconic",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "player",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "user"
+      ]
+    },
+    {
+      "id": "c35145c4-f737-42d2-ad97-31e497de0266",
+      "username": "vibes",
+      "email": "iconicvibes9675@gmail.com",
+      "firstName": "Vibes",
+      "lastName": "Iconic",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "vibes",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "user"
+      ]
+    }
   ]
 }
