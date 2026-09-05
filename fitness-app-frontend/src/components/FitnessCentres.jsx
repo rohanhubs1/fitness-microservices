@@ -341,31 +341,62 @@ const FitnessCentres = () => {
         );
     };
 
-    // Search by City name using free OpenStreetMap Nominatim
+    // Search by City name using high-speed Photon + OpenStreetMap Nominatim dual-engine
     const handleCitySearch = async (cityOverride) => {
-        const queryCity = cityOverride || cityInput;
-        if (!queryCity || !queryCity.trim()) return;
+        const queryCity = typeof cityOverride === 'string' && cityOverride.trim() ? cityOverride.trim() : (cityInput || '').trim();
+        if (!queryCity) return;
         setSearchTerm(''); // Clear keyword filter
         setLoadingLocation(true);
-        setLocationStatus(`Searching location coordinates for "${queryCity}"...`);
+        setLocationStatus(`Locating "${queryCity}"...`);
 
         try {
-            const geoRes = await fetch(
-                `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryCity.trim())}&limit=1`
-            );
-            const geoData = await geoRes.json();
-            if (geoData && geoData.length > 0) {
-                const lat = parseFloat(geoData[0].lat);
-                const lon = parseFloat(geoData[0].lon);
+            let lat = null;
+            let lon = null;
+
+            // 1. Try Photon Geocoder (Fastest, zero rate-limit, high availability)
+            try {
+                const pRes = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(queryCity)}&limit=1`, { signal: AbortSignal.timeout(3500) });
+                if (pRes.ok) {
+                    const pData = await pRes.json();
+                    if (pData?.features && pData.features.length > 0) {
+                        const coords = pData.features[0].geometry.coordinates; // [lon, lat]
+                        lon = parseFloat(coords[0]);
+                        lat = parseFloat(coords[1]);
+                    }
+                }
+            } catch {
+                // Failover to secondary engine
+            }
+
+            // 2. Secondary Engine: OpenStreetMap Nominatim
+            if (!lat || !lon) {
+                try {
+                    const geoRes = await fetch(
+                        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryCity)}&limit=1`,
+                        { signal: AbortSignal.timeout(4000) }
+                    );
+                    if (geoRes.ok) {
+                        const geoData = await geoRes.json();
+                        if (geoData && geoData.length > 0) {
+                            lat = parseFloat(geoData[0].lat);
+                            lon = parseFloat(geoData[0].lon);
+                        }
+                    }
+                } catch {
+                    // Fallback
+                }
+            }
+
+            if (lat && lon) {
                 setUserCoords({ lat, lon });
                 fetchLiveCentres(lat, lon, searchRadius);
             } else {
-                setLocationStatus(`No match found for "${queryCity}". Please try another city.`);
+                setLocationStatus(`No coordinates found for "${queryCity}". Displaying premier facilities.`);
                 setLoadingLocation(false);
             }
-        } catch (e) {
+        } catch {
             setLoadingLocation(false);
-            setLocationStatus('Unable to reach geocoding service. Displaying premier facilities.');
+            setLocationStatus('Displaying premier facilities.');
         }
     };
 
@@ -442,7 +473,7 @@ const FitnessCentres = () => {
             </Card>
 
             {/* Search, Radius & City Filter Bar */}
-            <Grid container spacing={2} sx={{ mb: 2 }} component="form" onSubmit={(e) => { e.preventDefault(); handleCitySearch(); }}>
+            <Grid container spacing={2} sx={{ mb: 2 }} component="form" onSubmit={(e) => { e.preventDefault(); handleCitySearch(cityInput); }}>
                 <Grid item xs={12} md={5}>
                     <TextField
                         fullWidth
@@ -451,7 +482,7 @@ const FitnessCentres = () => {
                         placeholder="Type city (e.g. Agra, Delhi, Mumbai, Bengaluru, New York)..."
                         value={cityInput}
                         onChange={(e) => setCityInput(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleCitySearch(); } }}
+                        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleCitySearch(cityInput); } }}
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
@@ -467,7 +498,7 @@ const FitnessCentres = () => {
                         fullWidth
                         variant="contained"
                         size="medium"
-                        onClick={() => handleCitySearch()}
+                        onClick={() => handleCitySearch(cityInput)}
                         disabled={loadingLocation || !cityInput.trim()}
                         startIcon={loadingLocation ? <CircularProgress size={16} color="inherit" /> : <SearchIcon />}
                         sx={{
