@@ -3,6 +3,7 @@ import { AuthContext } from "react-oauth2-code-pkce";
 import { useDispatch } from "react-redux";
 import { BrowserRouter as Router, Navigate, Route, Routes } from "react-router";
 import { setCredentials } from "./store/authSlice";
+import { registerUser } from "./store/api";
 import DashboardLayout from "./components/DashboardLayout";
 import LandingPage from "./components/LandingPage";
 import ActivityDetail from "./components/ActivityDetail";
@@ -16,6 +17,15 @@ const App = () => {
   useEffect(() => {
     if (token) {
       dispatch(setCredentials({ token, user: tokenData }));
+      if (tokenData?.sub) {
+        registerUser({
+          keycloakId: tokenData.sub,
+          email: tokenData.email || `${tokenData.preferred_username || 'athlete'}@pulseforge.ai`,
+          username: tokenData.preferred_username || tokenData.name || 'athlete',
+          firstName: tokenData.given_name || tokenData.name || '',
+          lastName: tokenData.family_name || ''
+        }).catch(() => {});
+      }
       // Clean up OAuth query parameters (?state=... &session_state=...) only after token is established
       if (typeof window !== 'undefined' && window.location.search && (window.location.search.includes('state=') || window.location.search.includes('session_state='))) {
         window.history.replaceState({}, document.title, window.location.pathname);

@@ -75,6 +75,7 @@ export const getActivityDetail = (id) => api.get(`/recommendations/activity/${id
 export const getActivityRecommendation = (id) => api.get(`/recommendations/activity/${id}`);
 export const getUserProfile = () => api.get('/users/profile');
 export const updateUserProfile = (data) => api.put('/users/profile', data);
+export const registerUser = (data) => api.post('/users/register', data);
 export const sendAIChatMessage = (payload) => api.post('/recommendations/chat', payload);
 
 // Admin Control Centre APIs

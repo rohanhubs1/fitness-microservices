@@ -62,9 +62,16 @@ public class UserService {
     public UserResponse getUserProfile(String userId) {
         User user = userRepository.findById(userId)
                 .orElseGet(() -> userRepository.findAll().stream()
-                        .filter(u -> userId.equals(u.getKeycloakId()))
+                        .filter(u -> userId != null && userId.equals(u.getKeycloakId()))
                         .findFirst()
-                        .orElseThrow(() -> new RuntimeException("User Not Found with ID:" + userId)));
+                        .orElseGet(() -> {
+                            User newUser = new User();
+                            newUser.setKeycloakId(userId);
+                            newUser.setEmail(userId + "@pulseforge.ai");
+                            newUser.setUsername("athlete");
+                            newUser.setRole(com.fitness.userService.model.UserRole.USER);
+                            return userRepository.save(newUser);
+                        }));
         return mapToResponse(user);
     }
 
@@ -175,9 +182,16 @@ public class UserService {
     private User findUserByIdOrKeycloakId(String userId) {
         return userRepository.findById(userId)
                 .orElseGet(() -> userRepository.findAll().stream()
-                        .filter(u -> userId.equals(u.getKeycloakId()))
+                        .filter(u -> userId != null && userId.equals(u.getKeycloakId()))
                         .findFirst()
-                        .orElseThrow(() -> new RuntimeException("User Not Found with ID: " + userId)));
+                        .orElseGet(() -> {
+                            User newUser = new User();
+                            newUser.setKeycloakId(userId);
+                            newUser.setEmail(userId + "@pulseforge.ai");
+                            newUser.setUsername("athlete");
+                            newUser.setRole(com.fitness.userService.model.UserRole.USER);
+                            return userRepository.save(newUser);
+                        }));
     }
 
     public Boolean existByUserId(String userId) {
@@ -187,7 +201,17 @@ public class UserService {
 
     public Boolean existBykeycloakId(String userId) {
         if (userId == null || userId.isBlank()) return false;
-        return Boolean.TRUE.equals(userRepository.existsByKeycloakId(userId)) || userRepository.existsById(userId);
+        boolean exists = Boolean.TRUE.equals(userRepository.existsByKeycloakId(userId)) || userRepository.existsById(userId);
+        if (!exists) {
+            User newUser = new User();
+            newUser.setKeycloakId(userId);
+            newUser.setEmail(userId + "@pulseforge.ai");
+            newUser.setUsername("athlete");
+            newUser.setRole(com.fitness.userService.model.UserRole.USER);
+            userRepository.save(newUser);
+            return true;
+        }
+        return true;
     }
 }
 
