@@ -254,8 +254,8 @@ const AdminDashboard = ({ activeTab = 0 }) => {
                             <Typography variant="h5" fontWeight="bold" sx={{ color: '#0F172A', letterSpacing: -0.5 }}>
                                 Platform Operations & Administration
                             </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                Root backoffice control • User moderation, community rankings & contests
+                            <Typography variant="body2" sx={{ color: '#475569', fontWeight: 500 }}>
+                                Admin Control Center • Athlete moderation, platform leaderboard & challenge broadcasts
                             </Typography>
                         </Box>
                     </Box>

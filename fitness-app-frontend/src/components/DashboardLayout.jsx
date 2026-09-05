@@ -37,7 +37,7 @@ import CommunityContests from './CommunityContests';
 import AdminDashboard from './AdminDashboard';
 import { getActiveAnnouncement, getUserProfile } from '../store/api';
 
-const DRAWER_WIDTH = 270;
+const DRAWER_WIDTH = 280;
 const DRAWER_COLLAPSED_WIDTH = 76;
 
 const ATHLETE_NAV_ITEMS = [
@@ -222,30 +222,30 @@ const DashboardLayout = ({ tokenData, logOut, onOpenProfile }) => {
         }}>
             {/* Logo & Header */}
             <Box sx={{
-                p: isCollapsed ? 1.5 : 2.5,
+                p: isCollapsed ? 1.5 : '18px 16px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: isCollapsed ? 'center' : 'space-between',
                 borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
                 minHeight: 64
             }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, overflow: 'hidden' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, minWidth: 0, flex: 1 }}>
                     <Avatar sx={{ bgcolor: isAdmin ? '#9333ea' : '#ff9800', width: 36, height: 36, flexShrink: 0 }}>
                         {isAdmin ? <AdminPanelSettingsIcon sx={{ fontSize: 22, color: '#fff' }} /> : <FitnessCenterIcon sx={{ fontSize: 22, color: '#000' }} />}
                     </Avatar>
                     {!isCollapsed && (
-                        <Box sx={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                            <Typography variant="h6" fontWeight="bold" sx={{ lineHeight: 1.1, letterSpacing: 0.5 }}>
-                                PulseForge <Typography component="span" variant="h6" sx={{ color: isAdmin ? '#c084fc' : '#ff9800', fontWeight: 'bold' }}>{isAdmin ? 'ADMIN' : 'AI'}</Typography>
+                        <Box sx={{ minWidth: 0, flex: 1, whiteSpace: 'nowrap' }}>
+                            <Typography variant="subtitle1" fontWeight="bold" sx={{ lineHeight: 1.2, letterSpacing: 0.2, fontSize: '1.05rem', color: '#fff' }}>
+                                PulseForge <Typography component="span" variant="inherit" sx={{ color: isAdmin ? '#c084fc' : '#ff9800', fontWeight: 'bold' }}>{isAdmin ? 'ADMIN' : 'AI'}</Typography>
                             </Typography>
-                            <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.68rem', display: 'block' }}>
-                                {isAdmin ? 'BACKOFFICE CONSOLE' : 'ATHLETIC INTELLIGENCE'}
+                            <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.55)', fontSize: '0.68rem', display: 'block', letterSpacing: 0.4, fontWeight: 500 }}>
+                                {isAdmin ? 'ADMIN PORTAL' : 'ATHLETIC INTELLIGENCE'}
                             </Typography>
                         </Box>
                     )}
                 </Box>
                 {!isMobile && !isCollapsed && (
-                    <IconButton size="small" onClick={() => setDrawerCollapsed(true)} sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                    <IconButton size="small" onClick={() => setDrawerCollapsed(true)} sx={{ color: 'rgba(255, 255, 255, 0.6)', flexShrink: 0, ml: 0.5, p: 0.5 }}>
                         <ChevronLeftIcon />
                     </IconButton>
                 )}
@@ -490,7 +490,7 @@ const DashboardLayout = ({ tokenData, logOut, onOpenProfile }) => {
             </Drawer>
 
             {/* Main Application Area */}
-            <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflowX: 'hidden' }}>
+            <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflowX: 'hidden', bgcolor: '#F8FAFC', color: '#0F172A', minHeight: '100vh' }}>
                 {/* Top App Header */}
                 <AppBar
                     position="sticky"
@@ -511,9 +511,9 @@ const DashboardLayout = ({ tokenData, logOut, onOpenProfile }) => {
                                 <Typography variant="h6" fontWeight="bold" sx={{ fontSize: { xs: '1rem', sm: '1.2rem' } }}>
                                     {navItems.find((i) => i.key === selectedTab)?.label || 'Dashboard'}
                                 </Typography>
-                                <Typography variant="caption" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' } }}>
-                                    {isAdmin ? 'Backoffice Operations & Community Management' : (navItems.find((i) => i.key === selectedTab)?.subtitle || 'Smart Training & Athletic Analytics')}
-                                 </Typography>
+                                <Typography variant="caption" sx={{ color: '#64748B', display: { xs: 'none', sm: 'block' }, fontWeight: 500 }}>
+                                    {isAdmin ? 'Admin Operations & Community Management' : (navItems.find((i) => i.key === selectedTab)?.subtitle || 'Smart Training & Athletic Analytics')}
+                                </Typography>
                             </Box>
                         </Box>
 

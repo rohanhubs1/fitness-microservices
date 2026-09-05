@@ -226,7 +226,7 @@ const Leaderboard = () => {
                             <Typography variant="h5" fontWeight="bold" sx={{ color: '#0F172A', letterSpacing: -0.5 }}>
                                 Community Leaderboard & Rankings
                             </Typography>
-                            <Typography variant="body2" color="text.secondary">
+                            <Typography variant="body2" sx={{ color: '#475569', fontWeight: 500 }}>
                                 Real-time dynamic ranking based on calories, workout duration, and consistency.
                             </Typography>
                         </Box>

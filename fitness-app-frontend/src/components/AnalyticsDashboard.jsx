@@ -47,7 +47,7 @@ const StatCard = ({ title, value, unit, icon: Icon, color, subtitle, badgeText =
     }}>
         <CardContent sx={{ p: 2.2, '&:last-child': { pb: 2.2 } }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.2 }}>
-                <Typography variant="caption" color="text.secondary" fontWeight="bold" sx={{ fontSize: '0.72rem', letterSpacing: 0.3 }}>
+                <Typography variant="caption" sx={{ color: '#475569', fontWeight: 'bold', fontSize: '0.72rem', letterSpacing: 0.3 }}>
                     {title}
                 </Typography>
                 <Avatar sx={{
@@ -84,7 +84,7 @@ const StatCard = ({ title, value, unit, icon: Icon, color, subtitle, badgeText =
                 )}
             </Box>
             {subtitle && (
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.68rem', mt: 0.3 }}>
+                <Typography variant="caption" sx={{ color: '#64748B', display: 'block', fontSize: '0.68rem', mt: 0.3, fontWeight: 500 }}>
                     {subtitle}
                 </Typography>
             )}
@@ -169,7 +169,7 @@ const AnalyticsDashboard = ({ refreshKey, onNavigateTab = () => {}, onOpenProfil
                     <Typography variant="h5" fontWeight="bold" sx={{ color: '#0F172A', display: 'flex', alignItems: 'center', gap: 1 }}>
                         {greeting}, {username}! 👋
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.3 }}>
+                    <Typography variant="body2" sx={{ color: '#475569', mt: 0.3, fontWeight: 500 }}>
                         Stay consistent. A healthier you is a stronger you.
                     </Typography>
                 </Box>
@@ -180,7 +180,7 @@ const AnalyticsDashboard = ({ refreshKey, onNavigateTab = () => {}, onOpenProfil
                             {todayFormattedDate}
                         </Typography>
                     </Box>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 500 }}>
                         Small steps. Big results. 🌱
                     </Typography>
                 </Box>
@@ -380,7 +380,7 @@ const AnalyticsDashboard = ({ refreshKey, onNavigateTab = () => {}, onOpenProfil
                                     <Typography variant="subtitle2" fontWeight="bold" sx={{ color: '#0F172A', display: 'flex', alignItems: 'center', gap: 0.8 }}>
                                         📈 7-Day Calorie Burn Trend
                                     </Typography>
-                                    <Typography variant="caption" color="text.secondary">
+                                    <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 500 }}>
                                         Daily active energy expenditure over past week
                                     </Typography>
                                 </Box>
@@ -390,7 +390,7 @@ const AnalyticsDashboard = ({ refreshKey, onNavigateTab = () => {}, onOpenProfil
                                 <ResponsiveContainer width="100%" height="100%">
                                     <AreaChart data={weeklyTrend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                         <defs>
-                                            <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
+                                             <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
                                                 <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.6}/>
                                                 <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.02}/>
                                             </linearGradient>
@@ -426,7 +426,7 @@ const AnalyticsDashboard = ({ refreshKey, onNavigateTab = () => {}, onOpenProfil
                                     <Typography variant="subtitle2" fontWeight="bold" sx={{ color: '#0F172A', display: 'flex', alignItems: 'center', gap: 0.8 }}>
                                         🥧 Activity Breakdown
                                     </Typography>
-                                    <Typography variant="caption" color="text.secondary">
+                                    <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 500 }}>
                                         Caloric share across sport categories
                                     </Typography>
                                 </Box>
@@ -437,7 +437,7 @@ const AnalyticsDashboard = ({ refreshKey, onNavigateTab = () => {}, onOpenProfil
                                     <Avatar sx={{ width: 44, height: 44, bgcolor: '#F1F5F9', color: '#94A3B8', mb: 1.2 }}>
                                         <FitnessCenterIcon sx={{ fontSize: 22 }} />
                                     </Avatar>
-                                    <Typography variant="subtitle2" fontWeight="bold" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
+                                    <Typography variant="subtitle2" fontWeight="bold" sx={{ color: '#475569', fontSize: '0.85rem' }}>
                                         No activity breakdown yet
                                     </Typography>
                                     <Typography variant="caption" color="text.disabled" sx={{ maxWidth: 200, mt: 0.3, fontSize: '0.72rem', lineHeight: 1.3 }}>
@@ -683,25 +683,25 @@ const AnalyticsDashboard = ({ refreshKey, onNavigateTab = () => {}, onOpenProfil
                             </Typography>
                             <Stack spacing={1}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Typography variant="caption" color="text.secondary">⚖️ Weight</Typography>
+                                    <Typography variant="caption" sx={{ color: '#475569', fontWeight: 500 }}>⚖️ Weight</Typography>
                                     <Typography variant="body2" fontWeight="bold" sx={{ color: '#0F172A' }}>
                                         {profile?.weight ? `${profile.weight} kg` : 'Not set'}
                                     </Typography>
                                 </Box>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Typography variant="caption" color="text.secondary">📏 Height</Typography>
+                                    <Typography variant="caption" sx={{ color: '#475569', fontWeight: 500 }}>📏 Height</Typography>
                                     <Typography variant="body2" fontWeight="bold" sx={{ color: '#0F172A' }}>
                                         {profile?.height ? `${profile.height} cm` : 'Not set'}
                                     </Typography>
                                 </Box>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Typography variant="caption" color="text.secondary">📊 BMI</Typography>
+                                    <Typography variant="caption" sx={{ color: '#475569', fontWeight: 500 }}>📊 BMI</Typography>
                                     <Typography variant="body2" fontWeight="bold" sx={{ color: bmiColor }}>
                                         {bmiValue ? `${bmiValue} (${bmiCategory})` : 'Not set'}
                                     </Typography>
                                 </Box>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Typography variant="caption" color="text.secondary">🎯 Goal</Typography>
+                                    <Typography variant="caption" sx={{ color: '#475569', fontWeight: 500 }}>🎯 Goal</Typography>
                                     <Chip 
                                         label={profile?.fitnessGoal ? profile.fitnessGoal.replace('_', ' ') : 'GENERAL FITNESS'} 
                                         size="small" 

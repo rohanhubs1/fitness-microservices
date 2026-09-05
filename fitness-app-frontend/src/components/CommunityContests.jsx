@@ -145,7 +145,7 @@ const CommunityContests = ({ onNavigateToLog, onNavigateToLeaderboard }) => {
                         <Typography variant="h5" fontWeight="bold" sx={{ color: '#0F172A', letterSpacing: -0.5 }}>
                             Contests & Community Challenges
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" sx={{ color: '#475569', fontWeight: 500 }}>
                             Official platform challenges, live workout competitions, and community rewards.
                         </Typography>
                     </Box>
