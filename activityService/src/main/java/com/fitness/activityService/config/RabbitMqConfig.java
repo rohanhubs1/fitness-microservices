@@ -55,42 +55,20 @@ public class RabbitMqConfig {
 
         if (url != null && !url.isBlank() && (url.startsWith("amqp://") || url.startsWith("amqps://"))) {
             try {
-                java.net.URI uri = new java.net.URI(url);
+                com.rabbitmq.client.ConnectionFactory rcf = new com.rabbitmq.client.ConnectionFactory();
+                rcf.setUri(url.trim());
                 org.springframework.amqp.rabbit.connection.CachingConnectionFactory factory =
-                        new org.springframework.amqp.rabbit.connection.CachingConnectionFactory();
-
-                if (uri.getHost() != null) {
-                    factory.setHost(uri.getHost());
-                }
-                if (uri.getPort() > 0) {
-                    factory.setPort(uri.getPort());
-                } else {
-                    factory.setPort("amqps".equalsIgnoreCase(uri.getScheme()) ? 5671 : 5672);
-                }
-
-                String userInfo = uri.getUserInfo();
-                if (userInfo != null && !userInfo.isBlank()) {
-                    String[] parts = userInfo.split(":", 2);
-                    factory.setUsername(parts[0]);
-                    if (parts.length > 1) {
-                        factory.setPassword(parts[1]);
-                    }
-                }
-
-                String path = uri.getPath();
-                if (path != null && path.length() > 1) {
-                    factory.setVirtualHost(path.substring(1));
-                }
-
-                if ("amqps".equalsIgnoreCase(uri.getScheme())) {
-                    factory.getRabbitConnectionFactory().useSslProtocol();
-                }
-
+                        new org.springframework.amqp.rabbit.connection.CachingConnectionFactory(rcf);
+                factory.setUsername(rcf.getUsername());
+                factory.setPassword(rcf.getPassword());
+                factory.setVirtualHost(rcf.getVirtualHost());
+                factory.setHost(rcf.getHost());
+                factory.setPort(rcf.getPort());
                 return factory;
             } catch (Exception e) {
                 org.springframework.amqp.rabbit.connection.CachingConnectionFactory factory =
                         new org.springframework.amqp.rabbit.connection.CachingConnectionFactory();
-                factory.setUri(url);
+                factory.setUri(url.trim());
                 return factory;
             }
         }
