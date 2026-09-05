@@ -1,10 +1,13 @@
 import axios from "axios";
 
-let rawBase = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
-if (!rawBase.endsWith('/api')) {
-    rawBase = rawBase.replace(/\/$/, '') + '/api';
+let rawBase = (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080').trim();
+
+// Cleanly normalize to exact root host, then append single '/api'
+rawBase = rawBase.replace(/\/+$/, '');
+while (rawBase.endsWith('/api')) {
+    rawBase = rawBase.slice(0, -4).replace(/\/+$/, '');
 }
-const API_URL = rawBase;
+const API_URL = `${rawBase}/api`;
 
 const api = axios.create({
     baseURL: API_URL
