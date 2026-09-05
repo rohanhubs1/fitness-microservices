@@ -24,4 +24,4 @@ ENV JAVA_OPTS="-Xms64m -Xmx384m -XX:+UseSerialGC"
 
 EXPOSE 10000
 
-ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start-dev", "--http-host=0.0.0.0", "--http-port=10000", "--import-realm"]
+ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start", "--optimized", "--http-host=0.0.0.0", "--http-port=10000", "--import-realm"]
