@@ -19,7 +19,7 @@ export const authConfig = {
 
   redirectUri: `${APP_BASE_URL}/`,
 
-  scope: 'openid profile email offline_access',
+  scope: 'openid profile email',
 
   storage: 'local',
 
