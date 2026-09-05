@@ -341,62 +341,31 @@ const FitnessCentres = () => {
         );
     };
 
-    // Search by City name using high-speed Photon + OpenStreetMap Nominatim dual-engine
+    // Search by City name using free OpenStreetMap Nominatim
     const handleCitySearch = async (cityOverride) => {
-        const queryCity = typeof cityOverride === 'string' && cityOverride.trim() ? cityOverride.trim() : (cityInput || '').trim();
-        if (!queryCity) return;
+        const queryCity = typeof cityOverride === 'string' ? cityOverride : cityInput;
+        if (!queryCity || !queryCity.trim()) return;
         setSearchTerm(''); // Clear keyword filter
         setLoadingLocation(true);
-        setLocationStatus(`Locating "${queryCity}"...`);
+        setLocationStatus(`Searching location coordinates for "${queryCity}"...`);
 
         try {
-            let lat = null;
-            let lon = null;
-
-            // 1. Try Photon Geocoder (Fastest, zero rate-limit, high availability)
-            try {
-                const pRes = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(queryCity)}&limit=1`, { signal: AbortSignal.timeout(3500) });
-                if (pRes.ok) {
-                    const pData = await pRes.json();
-                    if (pData?.features && pData.features.length > 0) {
-                        const coords = pData.features[0].geometry.coordinates; // [lon, lat]
-                        lon = parseFloat(coords[0]);
-                        lat = parseFloat(coords[1]);
-                    }
-                }
-            } catch {
-                // Failover to secondary engine
-            }
-
-            // 2. Secondary Engine: OpenStreetMap Nominatim
-            if (!lat || !lon) {
-                try {
-                    const geoRes = await fetch(
-                        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryCity)}&limit=1`,
-                        { signal: AbortSignal.timeout(4000) }
-                    );
-                    if (geoRes.ok) {
-                        const geoData = await geoRes.json();
-                        if (geoData && geoData.length > 0) {
-                            lat = parseFloat(geoData[0].lat);
-                            lon = parseFloat(geoData[0].lon);
-                        }
-                    }
-                } catch {
-                    // Fallback
-                }
-            }
-
-            if (lat && lon) {
+            const geoRes = await fetch(
+                `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryCity.trim())}&limit=1`
+            );
+            const geoData = await geoRes.json();
+            if (geoData && geoData.length > 0) {
+                const lat = parseFloat(geoData[0].lat);
+                const lon = parseFloat(geoData[0].lon);
                 setUserCoords({ lat, lon });
                 fetchLiveCentres(lat, lon, searchRadius);
             } else {
-                setLocationStatus(`No coordinates found for "${queryCity}". Displaying premier facilities.`);
+                setLocationStatus(`No match found for "${queryCity}". Please try another city.`);
                 setLoadingLocation(false);
             }
-        } catch {
+        } catch (e) {
             setLoadingLocation(false);
-            setLocationStatus('Displaying premier facilities.');
+            setLocationStatus('Unable to reach geocoding service. Displaying premier facilities.');
         }
     };
 
@@ -473,8 +442,8 @@ const FitnessCentres = () => {
             </Card>
 
             {/* Search, Radius & City Filter Bar */}
-            <Grid container spacing={2} sx={{ mb: 2 }} component="form" onSubmit={(e) => { e.preventDefault(); handleCitySearch(cityInput); }}>
-                <Grid item xs={12} md={5}>
+            <Grid container spacing={2} sx={{ mb: 2 }}>
+                <Grid item xs={12} md={6}>
                     <TextField
                         fullWidth
                         size="small"
@@ -482,38 +451,29 @@ const FitnessCentres = () => {
                         placeholder="Type city (e.g. Agra, Delhi, Mumbai, Bengaluru, New York)..."
                         value={cityInput}
                         onChange={(e) => setCityInput(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleCitySearch(cityInput); } }}
+                        onKeyDown={(e) => { if (e.key === 'Enter') handleCitySearch(); }}
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
                                     <LocationOnIcon color="primary" fontSize="small" />
                                 </InputAdornment>
+                            ),
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <Button
+                                        size="small"
+                                        variant="contained"
+                                        onClick={() => handleCitySearch()}
+                                        disabled={loadingLocation || !cityInput.trim()}
+                                        sx={{ textTransform: 'none', px: 2, height: 32, bgcolor: '#0284c7', color: '#fff', '&:hover': { bgcolor: '#0369a1' } }}
+                                    >
+                                        Search
+                                    </Button>
+                                </InputAdornment>
                             )
                         }}
                         sx={{ bgcolor: 'white', borderRadius: 2 }}
                     />
-                </Grid>
-                <Grid item xs={12} sm={4} md={2}>
-                    <Button
-                        fullWidth
-                        variant="contained"
-                        size="medium"
-                        onClick={() => handleCitySearch(cityInput)}
-                        disabled={loadingLocation || !cityInput.trim()}
-                        startIcon={loadingLocation ? <CircularProgress size={16} color="inherit" /> : <SearchIcon />}
-                        sx={{
-                            height: 40,
-                            bgcolor: '#003566',
-                            color: '#00f2fe',
-                            fontWeight: 'bold',
-                            textTransform: 'none',
-                            borderRadius: 2,
-                            boxShadow: 2,
-                            '&:hover': { bgcolor: '#0d1b2a', color: '#fff' }
-                        }}
-                    >
-                        {loadingLocation ? 'Searching...' : '🔍 Search City'}
-                    </Button>
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
                     <TextField
