@@ -42,7 +42,7 @@ public class RabbitMqConfig {
     private String rabbitmqVirtualHost;
 
     private static final String DEFAULT_CLOUDAMQP_URI =
-            "amqps://cdnkwxdt:CqyNdjfyxMsV4FRiPP2YrfaFQ7MtqZlx@gerbil.rmq.cloudamqp.com/cdnkwxdt";
+            "amqps://cdnkwxdt:CqyNdjfyxMsV4FRiPP2YrfaFQ7MtqZIx@gerbil.rmq.cloudamqp.com/cdnkwxdt";
 
     private String resolveUrl() {
         if (rabbitmqUrl != null && !rabbitmqUrl.isBlank() && !rabbitmqUrl.endsWith("@gerbil.rmq.cloud")) {
