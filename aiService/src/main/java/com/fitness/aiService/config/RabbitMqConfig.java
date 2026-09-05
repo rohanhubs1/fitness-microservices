@@ -31,6 +31,40 @@ public class RabbitMqConfig {
     @Value("${rabbitmq.dlx.queue.name:activity.queue.dlq}")
     private String dlqQueue;
 
+    @Value("${spring.rabbitmq.addresses:${RABBITMQ_URL:}}")
+    private String rabbitmqUrl;
+
+    @Value("${spring.rabbitmq.host:localhost}")
+    private String rabbitmqHost;
+
+    @Value("${spring.rabbitmq.port:5672}")
+    private int rabbitmqPort;
+
+    @Value("${spring.rabbitmq.username:guest}")
+    private String rabbitmqUsername;
+
+    @Value("${spring.rabbitmq.password:guest}")
+    private String rabbitmqPassword;
+
+    @Value("${spring.rabbitmq.virtual-host:/}")
+    private String rabbitmqVirtualHost;
+
+    @Bean
+    public ConnectionFactory connectionFactory() {
+        if (rabbitmqUrl != null && !rabbitmqUrl.isBlank() && (rabbitmqUrl.startsWith("amqp://") || rabbitmqUrl.startsWith("amqps://"))) {
+            org.springframework.amqp.rabbit.connection.CachingConnectionFactory factory =
+                    new org.springframework.amqp.rabbit.connection.CachingConnectionFactory();
+            factory.setUri(rabbitmqUrl);
+            return factory;
+        }
+        org.springframework.amqp.rabbit.connection.CachingConnectionFactory factory =
+                new org.springframework.amqp.rabbit.connection.CachingConnectionFactory(rabbitmqHost, rabbitmqPort);
+        factory.setUsername(rabbitmqUsername);
+        factory.setPassword(rabbitmqPassword);
+        factory.setVirtualHost(rabbitmqVirtualHost);
+        return factory;
+    }
+
     // Main Activity Queue with Dead-Letter Exchange arguments
     @Bean
     public Queue activityQueue() {
