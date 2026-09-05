@@ -102,9 +102,18 @@ public class RabbitMqConfig {
         return factory;
     }
 
+    @Value("${rabbitmq.dlx.exchange.name:fitness.exchange.dlx}")
+    private String dlxExchange;
+
+    @Value("${rabbitmq.dlx.routing.key:activity.tracking.dlq}")
+    private String dlqRoutingKey;
+
     @Bean
-    public Queue activityQueue(){
-        return new Queue(queue, true);
+    public Queue activityQueue() {
+        return org.springframework.amqp.core.QueueBuilder.durable(queue)
+                .withArgument("x-dead-letter-exchange", dlxExchange)
+                .withArgument("x-dead-letter-routing-key", dlqRoutingKey)
+                .build();
     }
 
     @Bean
