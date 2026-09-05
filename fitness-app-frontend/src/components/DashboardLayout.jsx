@@ -25,6 +25,8 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
 
 import GoalProgressBanner from './GoalProgressBanner';
 import AnalyticsDashboard from './AnalyticsDashboard';
@@ -36,6 +38,7 @@ import Leaderboard from './Leaderboard';
 import CommunityContests from './CommunityContests';
 import AdminDashboard from './AdminDashboard';
 import { getActiveAnnouncement, getUserProfile } from '../store/api';
+import { useThemeMode } from '../context/ThemeModeContext';
 
 const DRAWER_WIDTH = 270;
 const DRAWER_COLLAPSED_WIDTH = 76;
@@ -59,6 +62,7 @@ const ADMIN_NAV_ITEMS = [
 const DashboardLayout = ({ tokenData, logOut, onOpenProfile }) => {
     const location = useLocation();
     const navigate = useNavigate();
+    const { mode, toggleTheme } = useThemeMode();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [drawerCollapsed, setDrawerCollapsed] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
@@ -343,11 +347,23 @@ const DashboardLayout = ({ tokenData, logOut, onOpenProfile }) => {
                                     {!isCollapsed && (
                                         <ListItemText
                                             primary={item.label}
-                                            primaryTypographyProps={{ fontSize: '0.9rem', fontWeight: isSelected ? 'bold' : 'medium',  color: isSelected
-                                                ? (isAdmin ? '#c084fc' : '#ff9800')
-                                                : 'rgba(255, 255, 255, 0.9)',noWrap: true }}
+                                            primaryTypographyProps={{
+                                                fontSize: '0.92rem',
+                                                fontWeight: isSelected ? 700 : 600,
+                                                color: isSelected
+                                                    ? (isAdmin ? '#c084fc' : '#ff9800')
+                                                    : '#F8FAFC',
+                                                noWrap: true
+                                            }}
                                             secondary={item.subtitle}
-                                            secondaryTypographyProps={{ fontSize: '0.7rem', color: isSelected ? (isAdmin ? 'rgba(192, 132, 252, 0.8)' : 'rgba(255, 152, 0, 0.8)') : 'rgba(255, 255, 255, 0.4)', noWrap: true }}
+                                            secondaryTypographyProps={{
+                                                fontSize: '0.74rem',
+                                                fontWeight: isSelected ? 600 : 500,
+                                                color: isSelected
+                                                    ? (isAdmin ? '#e9d5ff' : '#fed7aa')
+                                                    : '#94A3B8',
+                                                noWrap: true
+                                            }}
                                         />
                                     )}
                                 </ListItemButton>
@@ -439,7 +455,7 @@ const DashboardLayout = ({ tokenData, logOut, onOpenProfile }) => {
     );
 
     return (
-        <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#F8FAFC' }}>
+        <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: mode === 'dark' ? '#0B0F19' : '#F8FAFC', color: mode === 'dark' ? '#F8FAFC' : '#0F172A', transition: 'background-color 0.25s ease' }}>
             {/* Sidebar for Desktop */}
             <Drawer
                 variant={isMobile ? 'temporary' : 'permanent'}
@@ -452,7 +468,7 @@ const DashboardLayout = ({ tokenData, logOut, onOpenProfile }) => {
                     '& .MuiDrawer-paper': {
                         width: isCollapsed ? DRAWER_COLLAPSED_WIDTH : DRAWER_WIDTH,
                         boxSizing: 'border-box',
-                        borderRight: 'none',
+                        borderRight: mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #E2E8F0',
                         overflowX: 'hidden',
                         scrollbarWidth: 'none',
                         '&::-webkit-scrollbar': { display: 'none' },
@@ -464,38 +480,46 @@ const DashboardLayout = ({ tokenData, logOut, onOpenProfile }) => {
             </Drawer>
 
             {/* Main Application Area */}
-            <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflowX: 'hidden' }}>
+            <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflowX: 'hidden', bgcolor: mode === 'dark' ? '#0B0F19' : '#F8FAFC' }}>
                 {/* Top App Header */}
                 <AppBar
                     position="sticky"
                     elevation={0}
                     sx={{
-                        bgcolor: 'white',
-                        color: '#0F172A',
-                        borderBottom: '1px solid #E2E8F0',
+                        bgcolor: mode === 'dark' ? '#0F172A' : '#FFFFFF',
+                        color: mode === 'dark' ? '#F8FAFC' : '#0F172A',
+                        borderBottom: mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #E2E8F0',
+                        transition: 'background-color 0.25s ease, border-color 0.25s ease',
                         zIndex: 5
                     }}
                 >
                     <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 2, sm: 4 } }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                            <IconButton edge="start" onClick={handleDrawerToggle} sx={{ color: '#334155' }}>
+                            <IconButton edge="start" onClick={handleDrawerToggle} sx={{ color: mode === 'dark' ? '#F8FAFC' : '#334155' }}>
                                 <MenuIcon />
                             </IconButton>
                             <Box>
-                                <Typography variant="h6" fontWeight="bold" sx={{ fontSize: { xs: '1rem', sm: '1.2rem' } }}>
+                                <Typography variant="h6" fontWeight="bold" sx={{ fontSize: { xs: '1rem', sm: '1.2rem' }, color: mode === 'dark' ? '#F8FAFC' : '#0F172A' }}>
                                     {navItems.find((i) => i.key === selectedTab)?.label || 'Dashboard'}
                                 </Typography>
-                                <Typography variant="caption" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' } }}>
+                                <Typography variant="caption" sx={{ color: mode === 'dark' ? '#94A3B8' : '#64748B', display: { xs: 'none', sm: 'block' } }}>
                                     {isAdmin ? 'Backoffice Operations & Community Management' : (navItems.find((i) => i.key === selectedTab)?.subtitle || 'Smart Training & Athletic Analytics')}
                                  </Typography>
                             </Box>
                         </Box>
 
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                            {/* Theme Toggle Button (Light / Dark Mode with persistent storage) */}
+                            <Tooltip title={mode === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}>
+                                <IconButton onClick={toggleTheme} sx={{ color: mode === 'dark' ? '#F8FAFC' : '#334155', border: mode === 'dark' ? '1px solid rgba(255,255,255,0.1)' : '1px solid #E2E8F0', borderRadius: 2 }}>
+                                    {mode === 'dark' ? <LightModeIcon sx={{ color: '#FDBA74', fontSize: 20 }} /> : <DarkModeIcon sx={{ color: '#6366F1', fontSize: 20 }} />}
+                                </IconButton>
+                            </Tooltip>
+
                             <Tooltip title="Notifications">
-                                <IconButton onClick={handleOpenNotifications} sx={{ color: '#334155' }}>
+                                <IconButton onClick={handleOpenNotifications} sx={{ color: mode === 'dark' ? '#F8FAFC' : '#334155', border: mode === 'dark' ? '1px solid rgba(255,255,255,0.1)' : '1px solid #E2E8F0', borderRadius: 2 }}>
                                     <Badge badgeContent={unreadCount} color="error">
-                                        <NotificationsIcon />
+                                        <NotificationsIcon sx={{ fontSize: 20 }} />
                                     </Badge>
                                 </IconButton>
                             </Tooltip>
@@ -511,9 +535,11 @@ const DashboardLayout = ({ tokenData, logOut, onOpenProfile }) => {
                                         width: 340,
                                         maxHeight: 460,
                                         borderRadius: 3,
-                                        boxShadow: '0 10px 40px rgba(0,0,0,0.12)',
+                                        boxShadow: mode === 'dark' ? '0 10px 40px rgba(0,0,0,0.5)' : '0 10px 40px rgba(0,0,0,0.12)',
                                         p: 1,
-                                        border: '1px solid #E2E8F0'
+                                        bgcolor: mode === 'dark' ? '#1E293B' : '#FFFFFF',
+                                        color: mode === 'dark' ? '#F8FAFC' : '#0F172A',
+                                        border: mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #E2E8F0'
                                     }
                                 }}
                             >
@@ -527,14 +553,14 @@ const DashboardLayout = ({ tokenData, logOut, onOpenProfile }) => {
                                         </Button>
                                     )}
                                 </Box>
-                                <Divider sx={{ mb: 1 }} />
+                                <Divider sx={{ mb: 1, borderColor: mode === 'dark' ? 'rgba(255,255,255,0.08)' : '#E2E8F0' }} />
                                 {allNotifications.length === 0 ? (
                                     <Box sx={{ p: 3, textAlign: 'center' }}>
                                         <CheckCircleIcon sx={{ fontSize: 32, color: '#10B981', mb: 1 }} />
-                                        <Typography variant="body2" fontWeight="bold" color="text.secondary">
+                                        <Typography variant="body2" fontWeight="bold" sx={{ color: mode === 'dark' ? '#94A3B8' : '#64748B' }}>
                                             You're All Caught Up!
                                         </Typography>
-                                        <Typography variant="caption" color="text.disabled">
+                                        <Typography variant="caption" sx={{ color: mode === 'dark' ? '#64748B' : '#94A3B8' }}>
                                             No platform alerts or broadcasts.
                                         </Typography>
                                     </Box>
@@ -552,17 +578,17 @@ const DashboardLayout = ({ tokenData, logOut, onOpenProfile }) => {
                                                     display: 'flex',
                                                     flexDirection: 'column',
                                                     alignItems: 'flex-start',
-                                                    bgcolor: !isRead && n.isHot ? '#FAF5FF' : isRead ? '#F8FAFC' : 'transparent',
-                                                    border: !isRead && n.isHot ? '1px solid #E9D5FF' : '1px solid transparent',
+                                                    bgcolor: !isRead && n.isHot ? (mode === 'dark' ? 'rgba(147, 51, 234, 0.2)' : '#FAF5FF') : isRead ? (mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#F8FAFC') : 'transparent',
+                                                    border: !isRead && n.isHot ? (mode === 'dark' ? '1px solid rgba(147, 51, 234, 0.4)' : '1px solid #E9D5FF') : '1px solid transparent',
                                                     opacity: isRead ? 0.75 : 1
                                                 }}
                                             >
                                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', mb: 0.3 }}>
                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
                                                         {!isRead && (
-                                                            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#7E22CE' }} />
+                                                            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#A855F7' }} />
                                                         )}
-                                                        <Typography variant="caption" fontWeight="bold" sx={{ color: !isRead && n.isHot ? '#7E22CE' : '#0F172A' }}>
+                                                        <Typography variant="caption" fontWeight="bold" sx={{ color: !isRead && n.isHot ? '#C084FC' : (mode === 'dark' ? '#F8FAFC' : '#0F172A') }}>
                                                             {n.title}
                                                         </Typography>
                                                     </Box>
@@ -572,12 +598,12 @@ const DashboardLayout = ({ tokenData, logOut, onOpenProfile }) => {
                                                         sx={{
                                                             fontSize: '0.65rem',
                                                             height: 18,
-                                                            bgcolor: isRead ? '#E2E8F0' : n.isHot ? '#FEF08A' : '#F1F5F9',
-                                                            color: isRead ? '#64748B' : n.isHot ? '#854D0E' : '#64748B'
+                                                            bgcolor: isRead ? (mode === 'dark' ? 'rgba(255,255,255,0.1)' : '#E2E8F0') : n.isHot ? '#FEF08A' : (mode === 'dark' ? 'rgba(255,255,255,0.08)' : '#F1F5F9'),
+                                                            color: isRead ? (mode === 'dark' ? '#94A3B8' : '#64748B') : n.isHot ? '#854D0E' : (mode === 'dark' ? '#CBD5E1' : '#64748B')
                                                         }}
                                                     />
                                                 </Box>
-                                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1.3 }}>
+                                                <Typography variant="caption" sx={{ color: mode === 'dark' ? '#94A3B8' : '#64748B', display: 'block', lineHeight: 1.3 }}>
                                                     {n.desc}
                                                 </Typography>
                                             </MenuItem>
@@ -591,7 +617,7 @@ const DashboardLayout = ({ tokenData, logOut, onOpenProfile }) => {
                                     icon={<AdminPanelSettingsIcon sx={{ '&&': { color: '#9333ea', fontSize: 16 } }} />}
                                     label="Root Administrator"
                                     size="small"
-                                    sx={{ bgcolor: '#FAF5FF', color: '#7E22CE', fontWeight: 'bold', border: '1px solid #E9D5FF' }}
+                                    sx={{ bgcolor: mode === 'dark' ? 'rgba(147, 51, 234, 0.2)' : '#FAF5FF', color: mode === 'dark' ? '#C084FC' : '#7E22CE', fontWeight: 'bold', border: mode === 'dark' ? '1px solid rgba(147, 51, 234, 0.4)' : '1px solid #E9D5FF' }}
                                 />
                             )}
                             <Avatar
@@ -606,7 +632,7 @@ const DashboardLayout = ({ tokenData, logOut, onOpenProfile }) => {
                 </AppBar>
 
                 {/* Main Content Body */}
-                <Container maxWidth={false} sx={{ py: 3.5, px: { xs: 2, sm: 3, md: 4 }, flexGrow: 1, width: '100%' }}>
+                <Container maxWidth={false} sx={{ py: 3.5, px: { xs: 2, sm: 3, md: 4 }, flexGrow: 1, width: '100%', bgcolor: mode === 'dark' ? '#0B0F19' : '#F8FAFC', color: mode === 'dark' ? '#F8FAFC' : '#0F172A' }}>
                     {/* ADMIN VIEW */}
                     {isAdmin ? (
                         <AdminDashboard activeTab={selectedTab} onTabChange={(t) => handleNavigateTab(t)} />
