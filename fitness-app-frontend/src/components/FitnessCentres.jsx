@@ -343,7 +343,7 @@ const FitnessCentres = () => {
 
     // Search by City name using free OpenStreetMap Nominatim
     const handleCitySearch = async (cityOverride) => {
-        const queryCity = typeof cityOverride === 'string' ? cityOverride : cityInput;
+        const queryCity = cityOverride || cityInput;
         if (!queryCity || !queryCity.trim()) return;
         setSearchTerm(''); // Clear keyword filter
         setLoadingLocation(true);
@@ -448,7 +448,7 @@ const FitnessCentres = () => {
                         fullWidth
                         size="small"
                         label="Discover in City / Area"
-                        placeholder="Type city (e.g. Agra, Delhi, Mumbai, Bengaluru, New York)..."
+                        placeholder="Type city (e.g. Delhi, Mumbai, Bengaluru, London, New York)..."
                         value={cityInput}
                         onChange={(e) => setCityInput(e.target.value)}
                         onKeyDown={(e) => { if (e.key === 'Enter') handleCitySearch(); }}
@@ -465,7 +465,7 @@ const FitnessCentres = () => {
                                         variant="contained"
                                         onClick={() => handleCitySearch()}
                                         disabled={loadingLocation || !cityInput.trim()}
-                                        sx={{ textTransform: 'none', px: 2, height: 32, bgcolor: '#0284c7', color: '#fff', '&:hover': { bgcolor: '#0369a1' } }}
+                                        sx={{ textTransform: 'none', px: 2, height: 32 }}
                                     >
                                         Search
                                     </Button>
@@ -518,7 +518,7 @@ const FitnessCentres = () => {
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
                     Quick Cities:
                 </Typography>
-                {['Agra', 'Delhi', 'Mumbai', 'Bengaluru', 'London', 'New York', 'Tokyo'].map((quickCity) => (
+                {['Delhi', 'Mumbai', 'Bengaluru', 'London', 'New York', 'Tokyo'].map((quickCity) => (
                     <Chip
                         key={quickCity}
                         size="small"
