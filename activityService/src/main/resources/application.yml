@@ -3,3 +3,30 @@ spring:
     name: activity-service
   config:
     import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
+
+  mongodb:
+    uri: ${MONGO_URI_ACTIVITY:${MONGO_URI:mongodb://localhost:27017/fitness}}
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+
+server:
+  port: 8082
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+
+rabbitmq:
+  exchange:
+    name: fitness.exchange
+  queue:
+    name: activity.queue
+  routing:
+    key: activity.tracking

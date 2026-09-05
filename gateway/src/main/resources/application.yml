@@ -4,3 +4,40 @@ spring:
   config:
     import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:https://pulseforge-keycloak.onrender.com/realms/fitness-oauth2/protocol/openid-connect/certs}
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: user-service
+              uri: ${USER_SERVICE_URL:lb://USER-SERVICE}
+              predicates:
+                - Path=/api/users/**
+
+            - id: activity-service
+              uri: ${ACTIVITY_SERVICE_URL:lb://ACTIVITY-SERVICE}
+              predicates:
+                - Path=/api/activities/**, /api/announcements/**
+
+            - id: ai-service
+              uri: ${AI_SERVICE_URL:lb://AI-SERVICE}
+              predicates:
+                - Path=/api/recommendations/**
+
+server:
+  port: 8080
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+
+
