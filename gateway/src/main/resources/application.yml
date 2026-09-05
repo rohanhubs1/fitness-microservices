@@ -23,7 +23,12 @@ spring:
             - id: activity-service
               uri: ${ACTIVITY_SERVICE_URL:lb://ACTIVITY-SERVICE}
               predicates:
-                - Path=/api/activities/**, /api/announcements/**
+                - Path=/api/activities/**
+
+            - id: announcement-service
+              uri: ${ACTIVITY_SERVICE_URL:lb://ACTIVITY-SERVICE}
+              predicates:
+                - Path=/api/announcements/**
 
             - id: ai-service
               uri: ${AI_SERVICE_URL:lb://AI-SERVICE}
