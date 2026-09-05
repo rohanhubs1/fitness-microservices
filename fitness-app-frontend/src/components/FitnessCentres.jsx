@@ -416,18 +416,26 @@ const FitnessCentres = () => {
                         <Button
                             variant="contained"
                             size="medium"
-                            startIcon={loadingLocation ? <CircularProgress size={18} color="inherit" /> : <MyLocationIcon />}
+                            startIcon={loadingLocation ? <CircularProgress size={18} sx={{ color: '#00f2fe' }} /> : <MyLocationIcon />}
                             onClick={handleFindNearMe}
                             disabled={loadingLocation}
                             sx={{
                                 bgcolor: '#00f2fe',
-                                color: '#000',
-                                fontWeight: 'bold',
+                                color: '#09101d',
+                                fontWeight: 700,
                                 textTransform: 'none',
                                 px: 2.5,
-                                py: 1,
+                                py: 1.1,
                                 borderRadius: 2,
-                                '&:hover': { bgcolor: '#4facfe' }
+                                border: '1px solid #00f2fe',
+                                boxShadow: '0 4px 14px rgba(0, 242, 254, 0.3)',
+                                '&:hover': { bgcolor: '#38bdf8', borderColor: '#38bdf8' },
+                                '&.Mui-disabled': {
+                                    bgcolor: 'rgba(0, 242, 254, 0.2)',
+                                    color: '#38bdf8',
+                                    borderColor: 'rgba(0, 242, 254, 0.4)',
+                                    opacity: 1
+                                }
                             }}
                         >
                             {loadingLocation ? 'Locating...' : '📍 Find Near My Live GPS'}
@@ -436,9 +444,9 @@ const FitnessCentres = () => {
                 </Grid>
 
                 {locationStatus && (
-                    <Box sx={{ mt: 2, pt: 1.5, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-                        <Typography variant="caption" sx={{ color: '#4facfe', fontWeight: 'medium' }}>
-                            {locationStatus}
+                    <Box sx={{ mt: 2, pt: 1.5, borderTop: '1px solid rgba(255,255,255,0.12)' }}>
+                        <Typography variant="caption" sx={{ color: '#67e8f9', fontWeight: 600, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                            ⚡ {locationStatus}
                         </Typography>
                     </Box>
                 )}
