@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
     Box, Grid, Card, CardContent, CardMedia, Typography,
     TextField, InputAdornment, Chip, Stack, Button, Rating,
-    Dialog, DialogTitle, DialogContent, DialogActions, Tooltip,
-    CircularProgress, Alert, MenuItem, Select, FormControl, InputLabel
+    Dialog, DialogTitle, DialogContent, DialogActions,
+    CircularProgress, MenuItem, Select, FormControl, InputLabel
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -14,31 +14,35 @@ import SportsTennisIcon from '@mui/icons-material/SportsTennis';
 import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
 import DirectionsIcon from '@mui/icons-material/Directions';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import PhoneIcon from '@mui/icons-material/Phone';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import LanguageIcon from '@mui/icons-material/Language';
 import NearMeIcon from '@mui/icons-material/NearMe';
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import VerifiedIcon from '@mui/icons-material/Verified';
 
+// ---------------------------------------------------------------------------
+// Sample content shown only before the user has ever searched. This is
+// clearly labelled as demo data in the UI and is NEVER re-labelled as "live"
+// or re-anchored to a real distance once a real search has been attempted.
+// ---------------------------------------------------------------------------
 const CURATED_SAMPLE_CENTRES = [
     {
         id: 'curated-1',
         name: 'PulseForge Elite Gym & Iron Box',
         category: 'GYM',
         image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop&q=80',
-        rating: 4.9,
-        reviewsCount: 238,
-        address: 'Plot 42, Cyber City Avenue, Tech Hub',
-        distanceKm: 0.8,
-        distanceText: '0.8 km away',
-        hours: 'Open 24/7',
-        phone: '+91 98765 43210',
-        price: 'Day Pass: ₹250 • Monthly: ₹2,500',
-        amenities: ['Heavy Free Weights', 'Squat Racks & Platforms', 'Cardio Deck', 'Sauna & Steam', 'Locker & Showers', 'Certified Coaches'],
-        description: 'Premium powerlifting and bodybuilding facility equipped with Olympic plates, calibrated barbells, and recovery zones.',
-        lat: 28.4595,
-        lon: 77.0266,
+        rating: null,
+        reviewsCount: null,
+        address: 'Sample listing — search above for real facilities near you',
+        distanceKm: null,
+        distanceText: 'Distance unknown',
+        hours: null,
+        phone: null,
+        price: 'Contact centre for membership plans',
+        amenities: ['Heavy Free Weights', 'Squat Racks & Platforms', 'Cardio Deck'],
+        description: 'Example listing shown before you search. Not a verified real-world facility.',
+        lat: null,
+        lon: null,
         isLive: false
     },
     {
@@ -46,18 +50,18 @@ const CURATED_SAMPLE_CENTRES = [
         name: 'AquaZone Olympic Aquatic Centre',
         category: 'SWIMMING',
         image: 'https://images.unsplash.com/photo-1519315901367-f34ff9154487?w=600&auto=format&fit=crop&q=80',
-        rating: 4.8,
-        reviewsCount: 184,
-        address: '108 Sports Complex Blvd, East Wing',
-        distanceKm: 1.5,
-        distanceText: '1.5 km away',
-        hours: '5:30 AM – 9:30 PM',
-        phone: '+91 98765 43211',
-        price: 'Per Session: ₹200 • Monthly Pass: ₹2,000',
-        amenities: ['50m Olympic 10-Lane Pool', 'Heated Indoor Pool', 'Diving Boards', 'Electronic Timing', 'Aqua Aerobics'],
-        description: 'Temperature-controlled 50-meter Olympic swimming facility with certified swim coaches and lane booking.',
-        lat: 28.4650,
-        lon: 77.0310,
+        rating: null,
+        reviewsCount: null,
+        address: 'Sample listing — search above for real facilities near you',
+        distanceKm: null,
+        distanceText: 'Distance unknown',
+        hours: null,
+        phone: null,
+        price: 'Contact centre for membership plans',
+        amenities: ['50m Olympic 10-Lane Pool', 'Heated Indoor Pool', 'Diving Boards'],
+        description: 'Example listing shown before you search. Not a verified real-world facility.',
+        lat: null,
+        lon: null,
         isLive: false
     },
     {
@@ -65,56 +69,18 @@ const CURATED_SAMPLE_CENTRES = [
         name: 'Zenith Yoga & Mindfulness Sanctuary',
         category: 'YOGA',
         image: 'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=600&auto=format&fit=crop&q=80',
-        rating: 4.9,
-        reviewsCount: 152,
-        address: '77 Green Park Lane, Suite 300',
-        distanceKm: 2.1,
-        distanceText: '2.1 km away',
-        hours: '6:00 AM – 8:30 PM',
-        phone: '+91 98765 43212',
-        price: 'Drop-in Class: ₹350 • Monthly Pack: ₹3,000',
-        amenities: ['Hot Yoga Studio', 'Vinyasa & Hatha', 'Meditation Hall', 'Organic Tea Lounge', 'Eco Yoga Mats Included'],
-        description: 'Serene studio offering Ashtanga, Vinyasa Flow, Aerial Yoga, and Sound Bath meditation sessions led by certified yogis.',
-        lat: 28.4720,
-        lon: 77.0380,
-        isLive: false
-    },
-    {
-        id: 'curated-4',
-        name: 'SmashPro Indoor Badminton & Squash Arena',
-        category: 'COURTS',
-        image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=600&auto=format&fit=crop&q=80',
-        rating: 4.7,
-        reviewsCount: 96,
-        address: 'Building 14, Arena District, West End',
-        distanceKm: 3.0,
-        distanceText: '3.0 km away',
-        hours: '6:00 AM – 11:00 PM',
-        phone: '+91 98765 43213',
-        price: 'Court Hourly: ₹400 / hr',
-        amenities: ['6 BWF Wooden Flooring Courts', '3 Glass Squash Courts', 'Racket Stringing', 'Pro Shop', 'Locker Rooms'],
-        description: 'Professional indoor sports arena with shock-absorbing synthetic wooden courts, LED glare-free lighting, and equipment rental.',
-        lat: 28.4810,
-        lon: 77.0450,
-        isLive: false
-    },
-    {
-        id: 'curated-5',
-        name: 'Apex CrossFit & Functional Fitness Hub',
-        category: 'CROSSFIT',
-        image: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80',
-        rating: 4.8,
-        reviewsCount: 120,
-        address: 'Warehouse 9, Industrial Zone 4',
-        distanceKm: 2.8,
-        distanceText: '2.8 km away',
-        hours: '6:00 AM – 9:00 PM',
-        phone: '+91 98765 43214',
-        price: 'WOD Drop-in: ₹350 • Monthly: ₹3,500',
-        amenities: ['Rigs & Gymnastics Rings', 'Assault Bikes & Rowers', 'Bumper Plates & Kettlebells', 'Group WOD Sessions'],
-        description: 'High-octane functional fitness box offering coached CrossFit WODs, endurance conditioning, and Olympic weightlifting.',
-        lat: 28.4890,
-        lon: 77.0510,
+        rating: null,
+        reviewsCount: null,
+        address: 'Sample listing — search above for real facilities near you',
+        distanceKm: null,
+        distanceText: 'Distance unknown',
+        hours: null,
+        phone: null,
+        price: 'Contact centre for membership plans',
+        amenities: ['Hot Yoga Studio', 'Vinyasa & Hatha', 'Meditation Hall'],
+        description: 'Example listing shown before you search. Not a verified real-world facility.',
+        lat: null,
+        lon: null,
         isLive: false
     }
 ];
@@ -154,7 +120,7 @@ const CATEGORY_IMAGES = {
 
 // Haversine distance in km
 function calculateDistanceKm(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Earth radius in km
+    const R = 6371;
     const dLat = (lat2 - lat1) * (Math.PI / 180);
     const dLon = (lon2 - lon1) * (Math.PI / 180);
     const a =
@@ -185,14 +151,104 @@ function detectCategory(tags) {
     return 'GYM';
 }
 
-function getRandomImageForCategory(cat, seed) {
+function getImageForCategory(cat, seed) {
     const list = CATEGORY_IMAGES[cat] || CATEGORY_IMAGES.GYM;
     const index = Math.abs(seed) % list.length;
     return list[index];
 }
 
+// Turn a set of raw Overpass tags into a display record WITHOUT inventing
+// any field that OSM doesn't actually provide. Missing data stays missing
+// and is rendered as such in the UI, instead of being replaced with a
+// plausible-looking placeholder.
+function buildRecordFromTags(tags, elId, idx, placeLat, placeLon, originLat, originLon) {
+    const category = detectCategory(tags);
+    const distanceKm = calculateDistanceKm(originLat, originLon, placeLat, placeLon);
+
+    const street = tags['addr:street'] ? `${tags['addr:housenumber'] || ''} ${tags['addr:street']}`.trim() : '';
+    const city = tags['addr:city'] || tags['addr:suburb'] || tags['addr:district'] || '';
+    const formattedAddress = street
+        ? `${street}${city ? ', ' + city : ''}`
+        : (tags['addr:full'] || null);
+
+    const amenities = [];
+    if (tags.shower === 'yes') amenities.push('Showers Available');
+    if (tags.sauna === 'yes') amenities.push('Sauna');
+    if (tags.swimming_pool === 'yes') amenities.push('Swimming Pool');
+    if (tags.air_conditioning === 'yes') amenities.push('Air Conditioned');
+    if (tags.wheelchair === 'yes') amenities.push('Wheelchair Accessible');
+    if (tags.surface) amenities.push(`Court Surface: ${tags.surface}`);
+
+    // Only use a rating/review count if OSM actually carries one. Real-world
+    // OSM data almost never has these tags — leave them null rather than
+    // generating a fake number, and let the UI show "Not yet rated" instead.
+    const rating = tags.rating ? parseFloat(tags.rating) : (tags.stars ? parseFloat(tags.stars) : null);
+    const reviewsCount = tags.user_ratings_total ? parseInt(tags.user_ratings_total, 10) : null;
+
+    let priceText = 'Contact centre for membership plans';
+    if (tags.fee === 'no') priceText = 'Public / Free Entry';
+    else if (tags.charge) priceText = tags.charge;
+
+    return {
+        id: `live-${elId ?? idx}`,
+        name: tags.name || null, // no name in OSM -> render "Unnamed facility", don't invent one
+        category,
+        image: getImageForCategory(category, elId ?? idx),
+        rating,
+        reviewsCount,
+        address: formattedAddress, // null if unknown — UI shows "Address not listed"
+        distanceKm,
+        distanceText: `${distanceKm} km away`,
+        hours: tags.opening_hours || null, // null -> UI shows "Hours not listed"
+        phone: tags.phone || tags['contact:phone'] || null,
+        website: tags.website || tags['contact:website'] || null,
+        price: priceText,
+        amenities,
+        description: `${category.charAt(0) + category.slice(1).toLowerCase()} facility sourced from OpenStreetMap, ${distanceKm} km from your search point.`,
+        lat: placeLat,
+        lon: placeLon,
+        isLive: true
+    };
+}
+
+const OVERPASS_ENDPOINTS = [
+    'https://overpass-api.de/api/interpreter',
+    'https://lz4.overpass-api.de/api/interpreter',
+    'https://overpass.kumi.systems/api/interpreter'
+];
+
+async function queryOverpass(lat, lon, radiusMeters) {
+    const query = `
+        [out:json][timeout:15];
+        (
+          node["leisure"~"fitness_centre|sports_centre|swimming_pool"](around:${radiusMeters},${lat},${lon});
+          node["sport"~"fitness|swimming|yoga|badminton|tennis|crossfit|gymnastics"](around:${radiusMeters},${lat},${lon});
+          way["leisure"~"fitness_centre|sports_centre|swimming_pool"](around:${radiusMeters},${lat},${lon});
+        );
+        out center 35;
+    `;
+
+    for (const base of OVERPASS_ENDPOINTS) {
+        try {
+            const res = await fetch(`${base}?data=${encodeURIComponent(query)}`, {
+                method: 'GET',
+                signal: AbortSignal.timeout(8000)
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data?.elements?.length) return data.elements;
+                return []; // valid response, genuinely no results — don't try to fake it
+            }
+        } catch {
+            // try next mirror
+        }
+    }
+    return null; // null = every mirror failed (network/service issue), not "zero results"
+}
+
 const FitnessCentres = () => {
     const [centres, setCentres] = useState(CURATED_SAMPLE_CENTRES);
+    const [hasSearched, setHasSearched] = useState(false);
     const [cityInput, setCityInput] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('ALL');
@@ -200,302 +256,121 @@ const FitnessCentres = () => {
     const [loadingLocation, setLoadingLocation] = useState(false);
     const [userCoords, setUserCoords] = useState(null);
     const [locationStatus, setLocationStatus] = useState(null);
-    const [searchRadius, setSearchRadius] = useState(7000); // 7 km radius
+    const [searchRadius, setSearchRadius] = useState(7000);
 
-    // Fetch Live OpenStreetMap Overpass Places around Coordinates with CORS-safe GET
-    const fetchLiveCentres = async (lat, lon, radiusMeters) => {
+    // Single accurate path used by BOTH "near me" (GPS) and "search a city".
+    // Both end up sourcing real tags from Overpass/OSM around a real
+    // coordinate, so no field is ever fabricated differently depending on
+    // which entry point the user used.
+    const searchAroundCoords = async (lat, lon, radiusMeters) => {
         setLoadingLocation(true);
         setLocationStatus('Querying live OpenStreetMap registry...');
+        setHasSearched(true);
 
-        const query = `
-            [out:json][timeout:15];
-            (
-              node["leisure"~"fitness_centre|sports_centre|swimming_pool"](around:${radiusMeters},${lat},${lon});
-              node["sport"~"fitness|swimming|yoga|badminton|tennis|crossfit|gymnastics"](around:${radiusMeters},${lat},${lon});
-              way["leisure"~"fitness_centre|sports_centre|swimming_pool"](around:${radiusMeters},${lat},${lon});
-            );
-            out center 35;
-        `;
+        const elements = await queryOverpass(lat, lon, radiusMeters);
 
-        try {
-            const endpoints = [
-                `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`,
-                `https://lz4.overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`,
-                `https://overpass.kumi.systems/api/interpreter?data=${encodeURIComponent(query)}`
-            ];
-
-            let data = null;
-            for (const ep of endpoints) {
-                try {
-                    const res = await fetch(ep, { method: 'GET', signal: AbortSignal.timeout(6000) });
-                    if (res.ok) {
-                        data = await res.json();
-                        if (data?.elements && data.elements.length > 0) break;
-                    }
-                } catch {
-                    // Try next mirror gracefully
-                }
-            }
-
-            if (data?.elements && data.elements.length > 0) {
-                const liveList = data.elements
-                    .filter((el) => el.tags && (el.tags.name || el.tags['addr:street']))
-                    .map((el, idx) => {
-                        const tags = el.tags || {};
-                        const placeLat = el.lat || el.center?.lat || lat;
-                        const placeLon = el.lon || el.center?.lon || lon;
-                        const category = detectCategory(tags);
-                        const distanceKm = calculateDistanceKm(lat, lon, placeLat, placeLon);
-
-                        const street = tags['addr:street'] ? `${tags['addr:housenumber'] || ''} ${tags['addr:street']}`.trim() : '';
-                        const city = tags['addr:city'] || tags['addr:suburb'] || tags['addr:district'] || '';
-                        const formattedAddress = street ? `${street}${city ? ', ' + city : ''}` : (tags['addr:full'] || 'Local Sports & Fitness Zone');
-
-                        const amenities = [];
-                        if (tags.opening_hours) amenities.push(`Hours: ${tags.opening_hours}`);
-                        if (tags.shower === 'yes') amenities.push('Showers Available');
-                        if (tags.sauna === 'yes') amenities.push('Sauna');
-                        if (tags.swimming_pool === 'yes') amenities.push('Swimming Pool');
-                        if (tags.air_conditioning === 'yes') amenities.push('Air Conditioned');
-                        if (tags.wheelchair === 'yes') amenities.push('Wheelchair Accessible');
-                        if (tags.surface) amenities.push(`Court Surface: ${tags.surface}`);
-
-                        const rawRating = tags['rating'] || tags['stars'] || null;
-                        const rating = rawRating ? parseFloat(rawRating) : parseFloat((4.5 + (idx % 5) * 0.1).toFixed(1));
-                        const reviewsCount = tags['user_ratings_total'] ? parseInt(tags['user_ratings_total']) : (30 + (idx * 13) % 150);
-
-                        let priceText = 'Contact centre for membership plans';
-                        if (tags.fee === 'no') {
-                            priceText = 'Public / Free Entry';
-                        } else if (tags.charge) {
-                            priceText = tags.charge;
-                        }
-
-                        return {
-                            id: `live-${el.id || idx}`,
-                            name: tags.name || `${category.charAt(0) + category.slice(1).toLowerCase()} Facility`,
-                            category,
-                            image: getRandomImageForCategory(category, el.id || idx),
-                            rating,
-                            reviewsCount,
-                            address: formattedAddress,
-                            distanceKm,
-                            distanceText: `${distanceKm} km away`,
-                            hours: tags.opening_hours || '6:00 AM – 10:00 PM',
-                            phone: tags.phone || tags['contact:phone'] || null,
-                            website: tags.website || tags['contact:website'] || null,
-                            price: priceText,
-                            amenities: amenities.length > 0 ? amenities : ['Cardio & Weights', 'Changing Rooms', 'Certified Trainers'],
-                            description: `Live verified ${category.toLowerCase()} facility located ${distanceKm} km away.`,
-                            lat: placeLat,
-                            lon: placeLon,
-                            isLive: true
-                        };
-                    });
-
-                liveList.sort((a, b) => a.distanceKm - b.distanceKm);
-                setCentres(liveList);
-                setLocationStatus(`✅ Found ${liveList.length} verified fitness facilities near you!`);
-            } else {
-                // Secondary failover: query Nominatim POIs around coordinates
-                try {
-                    const nomRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=gym+near+${lat},${lon}&limit=10`);
-                    if (nomRes.ok) {
-                        const nomData = await nomRes.json();
-                        if (Array.isArray(nomData) && nomData.length > 0) {
-                            const liveNom = nomData.map((el, idx) => {
-                                const placeLat = parseFloat(el.lat);
-                                const placeLon = parseFloat(el.lon);
-                                const d = calculateDistanceKm(lat, lon, placeLat, placeLon);
-                                return {
-                                    id: `nom-live-${el.place_id || idx}`,
-                                    name: el.name || el.display_name.split(',')[0],
-                                    category: 'GYM',
-                                    image: getRandomImageForCategory('GYM', idx),
-                                    rating: 4.7,
-                                    reviewsCount: 45 + idx * 8,
-                                    address: el.display_name.split(',').slice(1, 4).join(',').trim(),
-                                    distanceKm: d,
-                                    distanceText: `${d} km away`,
-                                    hours: '6:00 AM – 10:00 PM',
-                                    price: 'Contact centre for day pass',
-                                    amenities: ['Cardio & Free Weights', 'Changing Rooms'],
-                                    description: `Verified fitness facility located ${d} km away.`,
-                                    lat: placeLat,
-                                    lon: placeLon,
-                                    isLive: true
-                                };
-                            });
-                            setCentres(liveNom);
-                            setLocationStatus(`✅ Found ${liveNom.length} verified fitness facilities!`);
-                            return;
-                        }
-                    }
-                } catch {
-                    // ignore
-                }
-
-                // Fallback to calibrated distance
-                const updatedCurated = CURATED_SAMPLE_CENTRES.map((c) => {
-                    const d = calculateDistanceKm(lat, lon, c.lat, c.lon);
-                    return { ...c, distanceKm: d, distanceText: `${d} km away` };
-                }).sort((a, b) => a.distanceKm - b.distanceKm);
-
-                setCentres(updatedCurated);
-                setLocationStatus('ℹ️ Showing top fitness centres calibrated to your location.');
-            }
-        } catch {
-            setLocationStatus('Displaying premier facilities.');
-        } finally {
+        if (elements === null) {
+            setLocationStatus('⚠️ Could not reach the facility registry right now. Please try again shortly.');
+            setCentres([]);
             setLoadingLocation(false);
+            return;
         }
+
+        const usable = elements.filter((el) => el.tags);
+        const liveList = usable.map((el, idx) => {
+            const placeLat = el.lat ?? el.center?.lat ?? lat;
+            const placeLon = el.lon ?? el.center?.lon ?? lon;
+            return buildRecordFromTags(el.tags, el.id, idx, placeLat, placeLon, lat, lon);
+        });
+
+        liveList.sort((a, b) => a.distanceKm - b.distanceKm);
+        setCentres(liveList);
+
+        if (liveList.length > 0) {
+            setLocationStatus(`✅ Found ${liveList.length} facility record${liveList.length === 1 ? '' : 's'} within ${(radiusMeters / 1000)} km, sourced from OpenStreetMap.`);
+        } else {
+            setLocationStatus('No facilities found in OpenStreetMap for this radius — try a wider radius.');
+        }
+
+        setLoadingLocation(false);
     };
 
-    // Handle Click "Find Near My Live Location"
     const handleFindNearMe = () => {
         if (!navigator.geolocation) {
-            alert('Geolocation is not supported by your browser.');
+            setLocationStatus('⚠️ Geolocation is not supported by your browser.');
             return;
         }
 
         setLoadingLocation(true);
-        setLocationStatus('Acquiring precise GPS satellite lock...');
+        setLocationStatus('Acquiring GPS location...');
 
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 const { latitude, longitude } = position.coords;
                 setUserCoords({ lat: latitude, lon: longitude });
-                fetchLiveCentres(latitude, longitude, searchRadius);
+                searchAroundCoords(latitude, longitude, searchRadius);
             },
             () => {
                 setLoadingLocation(false);
-                setLocationStatus('⚠️ GPS access denied or timed out. Showing premier fitness centres.');
+                setLocationStatus('⚠️ GPS access denied or timed out.');
             },
             { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
         );
     };
 
-    // Search by City name using real OpenStreetMap live facilities
+    // Geocode the city name to ONE coordinate (a single Nominatim request,
+    // respecting its usage policy), then reuse the exact same Overpass
+    // pipeline as "near me" — so results carry real tags, not invented ones.
     const handleCitySearch = async (cityOverride) => {
-        const queryCity = typeof cityOverride === 'string' && cityOverride.trim() ? cityOverride.trim() : (cityInput || '').trim();
+        const queryCity = (typeof cityOverride === 'string' ? cityOverride : cityInput).trim();
         if (!queryCity) return;
-        setSearchTerm(''); // Clear keyword filter
+
+        setSearchTerm('');
         setLoadingLocation(true);
-        setLocationStatus(`Searching live verified facilities in "${queryCity}"...`);
+        setHasSearched(true);
+        setLocationStatus(`Locating "${queryCity}"...`);
 
         try {
-            const searchPromises = [
-                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=gym+in+${encodeURIComponent(queryCity)}&limit=15`),
-                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=fitness+in+${encodeURIComponent(queryCity)}&limit=15`),
-                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=swimming+pool+in+${encodeURIComponent(queryCity)}&limit=8`),
-                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=yoga+in+${encodeURIComponent(queryCity)}&limit=8`)
-            ];
+            const geoRes = await fetch(
+                `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryCity)}&limit=1`
+            );
+            if (!geoRes.ok) throw new Error('geocode failed');
+            const geoData = await geoRes.json();
 
-            const responses = await Promise.allSettled(searchPromises);
-            const allElements = [];
-            const seenNames = new Set();
-
-            for (const res of responses) {
-                if (res.status === 'fulfilled' && res.value.ok) {
-                    const data = await res.value.json();
-                    if (Array.isArray(data)) {
-                        for (const item of data) {
-                            const name = item.name || (item.display_name ? item.display_name.split(',')[0] : '');
-                            const key = name.toLowerCase().trim();
-                            if (name && !seenNames.has(key)) {
-                                seenNames.add(key);
-                                allElements.push(item);
-                            }
-                        }
-                    }
-                }
+            if (!geoData || geoData.length === 0) {
+                setLocationStatus(`Could not find a location matching "${queryCity}".`);
+                setCentres([]);
+                setLoadingLocation(false);
+                return;
             }
 
-            if (allElements.length > 0) {
-                const cityLat = parseFloat(allElements[0].lat);
-                const cityLon = parseFloat(allElements[0].lon);
-                setUserCoords({ lat: cityLat, lon: cityLon });
-
-                const liveList = allElements.map((el, idx) => {
-                    const placeLat = parseFloat(el.lat);
-                    const placeLon = parseFloat(el.lon);
-                    const name = el.name || el.display_name.split(',')[0];
-                    const addressParts = el.display_name ? el.display_name.split(',').slice(1, 4).join(',').trim() : queryCity;
-
-                    let category = 'GYM';
-                    const lowerName = (name + ' ' + (el.type || '') + ' ' + (el.class || '')).toLowerCase();
-                    if (lowerName.includes('swim') || lowerName.includes('pool') || lowerName.includes('aquatic')) category = 'SWIMMING';
-                    else if (lowerName.includes('yoga') || lowerName.includes('pilates') || lowerName.includes('meditation')) category = 'YOGA';
-                    else if (lowerName.includes('badminton') || lowerName.includes('squash') || lowerName.includes('tennis') || lowerName.includes('court')) category = 'COURTS';
-                    else if (lowerName.includes('crossfit') || lowerName.includes('hiit')) category = 'CROSSFIT';
-
-                    const distanceKm = calculateDistanceKm(cityLat, cityLon, placeLat, placeLon);
-
-                    return {
-                        id: `city-live-${el.place_id || idx}`,
-                        name: name,
-                        category: category,
-                        image: getRandomImageForCategory(category, idx),
-                        rating: parseFloat((4.6 + (idx % 4) * 0.1).toFixed(1)),
-                        reviewsCount: 35 + (idx * 19) % 180,
-                        address: addressParts || `${queryCity}`,
-                        distanceKm: distanceKm,
-                        distanceText: `${distanceKm} km from centre`,
-                        hours: '6:00 AM – 10:00 PM',
-                        phone: '+91 98765 ' + String(10000 + idx * 37).slice(0, 5),
-                        price: 'Contact centre for day pass & memberships',
-                        amenities: ['Cardio & Free Weights', 'Lockers & Changing Rooms', 'Certified Trainers', 'Air Conditioned'],
-                        description: `Live verified ${category.toLowerCase()} sports facility located in ${queryCity}.`,
-                        lat: placeLat,
-                        lon: placeLon,
-                        isLive: true
-                    };
-                });
-
-                liveList.sort((a, b) => a.distanceKm - b.distanceKm);
-                setCentres(liveList);
-                setLocationStatus(`✅ Found ${liveList.length} verified live fitness facilities in ${queryCity}!`);
-            } else {
-                // Fallback to coordinates geocoding
-                const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryCity)}&limit=1`);
-                const geoData = await geoRes.json();
-                if (geoData && geoData.length > 0) {
-                    const lat = parseFloat(geoData[0].lat);
-                    const lon = parseFloat(geoData[0].lon);
-                    setUserCoords({ lat, lon });
-                    fetchLiveCentres(lat, lon, searchRadius);
-                } else {
-                    setLocationStatus(`No verified facilities found for "${queryCity}".`);
-                }
-            }
+            const lat = parseFloat(geoData[0].lat);
+            const lon = parseFloat(geoData[0].lon);
+            setUserCoords({ lat, lon });
+            await searchAroundCoords(lat, lon, searchRadius);
         } catch {
-            setLocationStatus('Displaying premier facilities.');
-        } finally {
+            setLocationStatus('⚠️ Could not reach the location service right now. Please try again shortly.');
+            setCentres([]);
             setLoadingLocation(false);
         }
     };
 
     const filteredCentres = centres.filter((c) => {
         const matchesCategory = selectedCategory === 'ALL' || c.category === selectedCategory;
-        const matchesSearch = c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            c.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (c.amenities && c.amenities.some(a => a.toLowerCase().includes(searchTerm.toLowerCase())));
+        const haystack = `${c.name || ''} ${c.address || ''} ${(c.amenities || []).join(' ')}`.toLowerCase();
+        const matchesSearch = haystack.includes(searchTerm.toLowerCase());
         return matchesCategory && matchesSearch;
     });
 
     const openDirections = (name, lat, lon, address) => {
-        let query;
-        if (lat && lon) {
-            query = `${lat},${lon}`;
-        } else {
-            query = encodeURIComponent(`${name}, ${address}`);
-        }
+        const query = (lat != null && lon != null)
+            ? `${lat},${lon}`
+            : encodeURIComponent(`${name || ''}, ${address || ''}`);
         window.open(`https://www.google.com/maps/dir/?api=1&destination=${query}`, '_blank');
     };
 
     return (
         <Box sx={{ mb: 4 }}>
-            {/* Header & Live Location Banner */}
             <Card
                 sx={{
                     mb: 3,
@@ -512,7 +387,7 @@ const FitnessCentres = () => {
                             <NearMeIcon /> Real-Time Gyms & Sports Facilities
                         </Typography>
                         <Typography variant="body2" sx={{ color: '#e0e1dd', mt: 0.5 }}>
-                            Explore gymnasiums, Olympic swimming pools, CrossFit boxes, yoga studios, and badminton courts near you with INR (₹) rates and directions.
+                            Facility listings are sourced live from OpenStreetMap. Fields OSM doesn't have (rating, hours, phone) are shown as "not listed" rather than guessed.
                         </Typography>
                     </Grid>
                     <Grid item xs={12} md={5} sx={{ display: 'flex', gap: 1.5, justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
@@ -531,11 +406,7 @@ const FitnessCentres = () => {
                                 py: 1,
                                 borderRadius: 2,
                                 '&:hover': { bgcolor: '#4facfe' },
-                                '&.Mui-disabled': {
-                                    bgcolor: '#0284c7 !important',
-                                    color: '#ffffff !important',
-                                    opacity: 1
-                                }
+                                '&.Mui-disabled': { bgcolor: '#0284c7 !important', color: '#ffffff !important', opacity: 1 }
                             }}
                         >
                             {loadingLocation ? 'Locating...' : '📍 Find Near My Live GPS'}
@@ -552,14 +423,13 @@ const FitnessCentres = () => {
                 )}
             </Card>
 
-            {/* Search, Radius & City Filter Bar */}
             <Grid container spacing={1.5} sx={{ mb: 2 }}>
                 <Grid item xs={8} sm={8} md={5}>
                     <TextField
                         fullWidth
                         size="small"
                         label="Discover in City / Area"
-                        placeholder="Type city (e.g. Agra, Delhi, Mumbai, Bengaluru, New York)..."
+                        placeholder="Type city (e.g. Agra, Delhi, Mumbai, London, New York)..."
                         value={cityInput}
                         onChange={(e) => setCityInput(e.target.value)}
                         onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleCitySearch(cityInput); } }}
@@ -590,11 +460,7 @@ const FitnessCentres = () => {
                             borderRadius: 2,
                             boxShadow: 2,
                             '&:hover': { bgcolor: '#0d1b2a', color: '#fff' },
-                            '&.Mui-disabled': {
-                                bgcolor: '#0284c7 !important',
-                                color: '#ffffff !important',
-                                opacity: 0.8
-                            }
+                            '&.Mui-disabled': { bgcolor: '#0284c7 !important', color: '#ffffff !important', opacity: 0.8 }
                         }}
                     >
                         {loadingLocation ? 'Searching...' : '🔍 Search'}
@@ -626,7 +492,7 @@ const FitnessCentres = () => {
                             label="Search Radius"
                             onChange={(e) => {
                                 setSearchRadius(e.target.value);
-                                if (userCoords) fetchLiveCentres(userCoords.lat, userCoords.lon, e.target.value);
+                                if (userCoords) searchAroundCoords(userCoords.lat, userCoords.lon, e.target.value);
                             }}
                         >
                             <MenuItem value={3000}>3 km (Walk)</MenuItem>
@@ -638,7 +504,6 @@ const FitnessCentres = () => {
                 </Grid>
             </Grid>
 
-            {/* Popular Quick City Shortcuts */}
             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2, overflowX: 'auto', py: 0.5 }}>
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
                     Quick Cities:
@@ -648,16 +513,12 @@ const FitnessCentres = () => {
                         key={quickCity}
                         size="small"
                         label={quickCity}
-                        onClick={() => {
-                            setCityInput(quickCity);
-                            handleCitySearch(quickCity);
-                        }}
+                        onClick={() => { setCityInput(quickCity); handleCitySearch(quickCity); }}
                         sx={{ cursor: 'pointer', fontSize: '0.75rem', bgcolor: 'white', '&:hover': { bgcolor: '#e0f2fe' } }}
                     />
                 ))}
             </Stack>
 
-            {/* Category Filter Pills */}
             <Stack direction="row" spacing={1} sx={{ mb: 3, overflowX: 'auto', py: 0.5 }}>
                 {CATEGORIES.map((cat) => (
                     <Chip
@@ -671,7 +532,12 @@ const FitnessCentres = () => {
                 ))}
             </Stack>
 
-            {/* Centres Grid */}
+            {!hasSearched && (
+                <Typography variant="caption" sx={{ display: 'block', mb: 2, color: 'text.secondary', fontStyle: 'italic' }}>
+                    Showing example listings below. Use "Find Near My Live GPS" or search a city to see real, verified facilities.
+                </Typography>
+            )}
+
             {loadingLocation ? (
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 8 }}>
                     <CircularProgress size={45} sx={{ mb: 2 }} />
@@ -717,98 +583,48 @@ const FitnessCentres = () => {
                                     boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
                                     transition: 'transform 0.2s, box-shadow 0.2s',
                                     overflow: 'hidden',
-                                    '&:hover': {
-                                        transform: 'translateY(-4px)',
-                                        boxShadow: '0 10px 25px rgba(0,0,0,0.08)'
-                                    }
+                                    '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 10px 25px rgba(0,0,0,0.08)' }
                                 }}
                             >
                                 <Box sx={{ position: 'relative' }}>
-                                    <CardMedia
-                                        component="img"
-                                        height="180"
-                                        image={centre.image}
-                                        alt={centre.name}
-                                        sx={{ objectFit: 'cover' }}
+                                    <CardMedia component="img" height="180" image={centre.image} alt={centre.name || 'Facility'} sx={{ objectFit: 'cover' }} />
+                                    <Chip
+                                        icon={centre.isLive ? <VerifiedIcon sx={{ '&&': { color: '#00f2fe', fontSize: 14 } }} /> : undefined}
+                                        label={centre.isLive ? 'OSM Sourced' : 'Sample Data'}
+                                        size="small"
+                                        sx={{
+                                            position: 'absolute', top: 10, right: 10,
+                                            bgcolor: 'rgba(15,23,42,0.85)',
+                                            color: centre.isLive ? '#00f2fe' : '#F97316',
+                                            fontWeight: 'bold', fontSize: '0.68rem',
+                                            backdropFilter: 'blur(4px)', height: 22
+                                        }}
                                     />
-                                    {centre.isLive ? (
-                                        <Chip
-                                            icon={<VerifiedIcon sx={{ '&&': { color: '#00f2fe', fontSize: 14 } }} />}
-                                            label="Live Verified"
-                                            size="small"
-                                            sx={{
-                                                position: 'absolute',
-                                                top: 10,
-                                                right: 10,
-                                                bgcolor: 'rgba(15,23,42,0.85)',
-                                                color: '#00f2fe',
-                                                fontWeight: 'bold',
-                                                fontSize: '0.68rem',
-                                                backdropFilter: 'blur(4px)',
-                                                height: 22
-                                            }}
-                                        />
-                                    ) : (
-                                        <Chip
-                                            label="Featured Facility"
-                                            size="small"
-                                            sx={{
-                                                position: 'absolute',
-                                                top: 10,
-                                                right: 10,
-                                                bgcolor: 'rgba(15,23,42,0.85)',
-                                                color: '#F97316',
-                                                fontWeight: 'bold',
-                                                fontSize: '0.68rem',
-                                                backdropFilter: 'blur(4px)',
-                                                height: 22
-                                            }}
-                                        />
-                                    )}
                                 </Box>
 
-                                <CardContent sx={{
-                                    flexGrow: 1,
-                                    p: 2.5,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    justifyContent: 'space-between'
-                                }}>
+                                <CardContent sx={{ flexGrow: 1, p: 2.5, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                                     <Box>
-                                        {/* Facility Name (locked 2-line max for perfect alignment) */}
                                         <Typography
                                             variant="subtitle1"
                                             fontWeight="bold"
                                             sx={{
-                                                fontSize: '1rem',
-                                                lineHeight: 1.3,
-                                                color: '#0F172A',
-                                                minHeight: 44,
-                                                display: '-webkit-box',
-                                                WebkitLineClamp: 2,
-                                                WebkitBoxOrient: 'vertical',
-                                                overflow: 'hidden',
-                                                mb: 1
+                                                fontSize: '1rem', lineHeight: 1.3, color: '#0F172A', minHeight: 44,
+                                                display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', mb: 1
                                             }}
                                         >
-                                            {centre.name}
+                                            {centre.name || 'Unnamed facility'}
                                         </Typography>
 
-                                        {/* Rating & Distance Line */}
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.2, minHeight: 24 }}>
                                             {centre.rating ? (
                                                 <>
                                                     <Rating value={centre.rating} precision={0.1} size="small" readOnly />
                                                     <Typography variant="caption" fontWeight="bold" sx={{ color: '#0F172A' }}>
-                                                        {centre.rating} {centre.reviewsCount ? `(${centre.reviewsCount})` : ''}
+                                                        {centre.rating}{centre.reviewsCount ? ` (${centre.reviewsCount})` : ''}
                                                     </Typography>
                                                 </>
                                             ) : (
-                                                <Chip
-                                                    label={centre.category}
-                                                    size="small"
-                                                    sx={{ bgcolor: '#EFF6FF', color: '#2563EB', fontWeight: 'bold', fontSize: '0.68rem', height: 20 }}
-                                                />
+                                                <Chip label="Not yet rated" size="small" sx={{ bgcolor: '#F1F5F9', color: '#64748B', fontWeight: 'bold', fontSize: '0.68rem', height: 20 }} />
                                             )}
                                             <Chip
                                                 size="small"
@@ -819,29 +635,18 @@ const FitnessCentres = () => {
                                             />
                                         </Box>
 
-                                        {/* Address (Locked 2-line max) */}
                                         <Typography
                                             variant="body2"
                                             color="text.secondary"
-                                            sx={{
-                                                display: '-webkit-box',
-                                                WebkitLineClamp: 2,
-                                                WebkitBoxOrient: 'vertical',
-                                                overflow: 'hidden',
-                                                minHeight: 38,
-                                                fontSize: '0.8rem',
-                                                lineHeight: 1.3,
-                                                mb: 1
-                                            }}
+                                            sx={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', minHeight: 38, fontSize: '0.8rem', lineHeight: 1.3, mb: 1 }}
                                         >
-                                            📍 {centre.address}
+                                            📍 {centre.address || 'Address not listed'}
                                         </Typography>
 
-                                        {/* Hours or Pricing Info */}
                                         <Box sx={{ minHeight: 42, mb: 1.5 }}>
                                             <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.4 }}>
                                                 <AccessTimeIcon sx={{ fontSize: 14, color: '#64748B' }} />
-                                                {centre.hours ? centre.hours : 'Hours: Contact facility'}
+                                                {centre.hours || 'Hours not listed'}
                                             </Typography>
                                             <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#EA580C', fontWeight: 600 }}>
                                                 <CurrencyRupeeIcon sx={{ fontSize: 14 }} />
@@ -849,7 +654,6 @@ const FitnessCentres = () => {
                                             </Typography>
                                         </Box>
 
-                                        {/* Amenities Badges (Controlled height) */}
                                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, minHeight: 28, mb: 2 }}>
                                             {centre.amenities && centre.amenities.length > 0 ? (
                                                 <>
@@ -861,20 +665,13 @@ const FitnessCentres = () => {
                                                     )}
                                                 </>
                                             ) : (
-                                                <Chip label="Facility Details Available" size="small" sx={{ fontSize: '0.65rem', bgcolor: '#F1F5F9', height: 20 }} />
+                                                <Chip label="No amenity data listed" size="small" sx={{ fontSize: '0.65rem', bgcolor: '#F1F5F9', height: 20 }} />
                                             )}
                                         </Box>
                                     </Box>
 
-                                    {/* Action Buttons */}
                                     <Box sx={{ display: 'flex', gap: 1.2, mt: 'auto', pt: 1, borderTop: '1px solid #F1F5F9' }}>
-                                        <Button
-                                            fullWidth
-                                            variant="outlined"
-                                            size="small"
-                                            onClick={() => setSelectedCentre(centre)}
-                                            sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.78rem' }}
-                                        >
+                                        <Button fullWidth variant="outlined" size="small" onClick={() => setSelectedCentre(centre)} sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.78rem' }}>
                                             Details
                                         </Button>
                                         <Button
@@ -882,6 +679,7 @@ const FitnessCentres = () => {
                                             variant="contained"
                                             size="small"
                                             startIcon={<DirectionsIcon />}
+                                            disabled={centre.lat == null || centre.lon == null}
                                             onClick={() => openDirections(centre.name, centre.lat, centre.lon, centre.address)}
                                             sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '0.78rem', bgcolor: '#2563EB', '&:hover': { bgcolor: '#1D4ED8' } }}
                                         >
@@ -895,45 +693,36 @@ const FitnessCentres = () => {
                 </Box>
             )}
 
-            {/* Centre Detail Modal */}
             {selectedCentre && (
                 <Dialog open={Boolean(selectedCentre)} onClose={() => setSelectedCentre(null)} maxWidth="sm" fullWidth>
                     <DialogTitle sx={{ fontWeight: 'bold', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        {selectedCentre.name}
-                        {selectedCentre.isLive && (
-                            <Chip label="Live Verified" size="small" color="info" variant="outlined" />
-                        )}
+                        {selectedCentre.name || 'Unnamed facility'}
+                        <Chip label={selectedCentre.isLive ? 'OSM Sourced' : 'Sample Data'} size="small" color={selectedCentre.isLive ? 'info' : 'warning'} variant="outlined" />
                     </DialogTitle>
                     <DialogContent dividers>
-                        <CardMedia
-                            component="img"
-                            height="200"
-                            image={selectedCentre.image}
-                            alt={selectedCentre.name}
-                            sx={{ borderRadius: 2, mb: 2 }}
-                        />
+                        <CardMedia component="img" height="200" image={selectedCentre.image} alt={selectedCentre.name || 'Facility'} sx={{ borderRadius: 2, mb: 2 }} />
                         <Typography variant="body2" color="text.secondary" paragraph>
                             {selectedCentre.description}
                         </Typography>
 
-                        {/* Amenities */}
-                        {selectedCentre.amenities && selectedCentre.amenities.length > 0 && (
-                            <>
-                                <Typography variant="subtitle2" fontWeight="bold" sx={{ mt: 2, mb: 1 }}>
-                                    💎 Verified Features:
-                                </Typography>
-                                <Grid container spacing={1} sx={{ mb: 2 }}>
-                                    {selectedCentre.amenities.map((a) => (
-                                        <Grid item xs={6} key={a} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                            <CheckCircleIcon color="success" sx={{ fontSize: 16 }} />
-                                            <Typography variant="body2" sx={{ fontSize: '0.82rem' }}>{a}</Typography>
-                                        </Grid>
-                                    ))}
-                                </Grid>
-                            </>
+                        <Typography variant="subtitle2" fontWeight="bold" sx={{ mt: 2, mb: 1 }}>
+                            💎 Listed Features:
+                        </Typography>
+                        {selectedCentre.amenities && selectedCentre.amenities.length > 0 ? (
+                            <Grid container spacing={1} sx={{ mb: 2 }}>
+                                {selectedCentre.amenities.map((a) => (
+                                    <Grid item xs={6} key={a} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                        <CheckCircleIcon color="success" sx={{ fontSize: 16 }} />
+                                        <Typography variant="body2" sx={{ fontSize: '0.82rem' }}>{a}</Typography>
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        ) : (
+                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                                No amenity data available for this listing.
+                            </Typography>
                         )}
 
-                        {/* Pricing */}
                         <Typography variant="subtitle2" fontWeight="bold" sx={{ mt: 2, mb: 0.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
                             <CurrencyRupeeIcon sx={{ fontSize: 16, color: '#EA580C' }} /> Pricing & Plans:
                         </Typography>
@@ -941,32 +730,22 @@ const FitnessCentres = () => {
                             {selectedCentre.price}
                         </Typography>
 
-                        {/* Contact info */}
                         <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 0.5 }}>
                             📍 Location & Contact:
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            📍 {selectedCentre.address} ({selectedCentre.distanceText})
+                            📍 {selectedCentre.address || 'Address not listed'} ({selectedCentre.distanceText})
                         </Typography>
                         <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                            ⏰ Hours: {selectedCentre.hours ? selectedCentre.hours : 'Not specified (Contact centre)'}
+                            ⏰ Hours: {selectedCentre.hours || 'Not listed'}
                         </Typography>
-                        {selectedCentre.phone && (
-                            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                                📞 Phone: {selectedCentre.phone}
-                            </Typography>
-                        )}
+                        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                            📞 Phone: {selectedCentre.phone || 'Not listed'}
+                        </Typography>
 
                         {selectedCentre.website && (
                             <Box sx={{ mt: 1.5 }}>
-                                <Button
-                                    size="small"
-                                    startIcon={<LanguageIcon />}
-                                    href={selectedCentre.website}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    sx={{ textTransform: 'none' }}
-                                >
+                                <Button size="small" startIcon={<LanguageIcon />} href={selectedCentre.website} target="_blank" rel="noreferrer" sx={{ textTransform: 'none' }}>
                                     Official Website
                                 </Button>
                             </Box>
@@ -977,6 +756,7 @@ const FitnessCentres = () => {
                         <Button
                             variant="contained"
                             startIcon={<DirectionsIcon />}
+                            disabled={selectedCentre.lat == null || selectedCentre.lon == null}
                             onClick={() => openDirections(selectedCentre.name, selectedCentre.lat, selectedCentre.lon, selectedCentre.address)}
                             sx={{ textTransform: 'none', bgcolor: '#2563EB' }}
                         >
