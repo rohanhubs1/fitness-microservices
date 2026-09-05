@@ -54,16 +54,24 @@ public class RabbitMqConfig {
             "amqps://cdnkwxdt:CqyNdjfyxMsV4FRiPP2YrfaFQ7MtqZIx@gerbil.rmq.cloudamqp.com/cdnkwxdt";
 
     private String resolveUrl() {
-        if (rabbitmqUrl != null && !rabbitmqUrl.isBlank() && !rabbitmqUrl.endsWith("@gerbil.rmq.cloud")) {
-            return rabbitmqUrl.trim();
-        }
-        for (String key : new String[]{"CLOUDAMQP_URL", "Cloudamqp_url", "cloudamqp_url", "RABBITMQ_URL", "Rabbitmq_url", "rabbitmq_url", "SPRING_RABBITMQ_ADDRESSES", "SPRING_RABBITMQ_URI"}) {
-            String val = System.getenv(key);
-            if (val != null && !val.isBlank() && !val.endsWith("@gerbil.rmq.cloud")) {
-                return val.trim();
+        String url = rabbitmqUrl;
+        if (url == null || url.isBlank() || url.endsWith("@gerbil.rmq.cloud")) {
+            for (String key : new String[]{"CLOUDAMQP_URL", "Cloudamqp_url", "cloudamqp_url", "RABBITMQ_URL", "Rabbitmq_url", "rabbitmq_url", "SPRING_RABBITMQ_ADDRESSES", "SPRING_RABBITMQ_URI"}) {
+                String val = System.getenv(key);
+                if (val != null && !val.isBlank() && !val.endsWith("@gerbil.rmq.cloud")) {
+                    url = val;
+                    break;
+                }
             }
         }
-        return DEFAULT_CLOUDAMQP_URI;
+        if (url == null || url.isBlank() || url.endsWith("@gerbil.rmq.cloud") || url.contains("localhost")) {
+            url = DEFAULT_CLOUDAMQP_URI;
+        }
+        url = url.trim();
+        if (url.contains("MtqZlx")) {
+            url = url.replace("MtqZlx", "MtqZIx");
+        }
+        return url;
     }
 
     @Bean
