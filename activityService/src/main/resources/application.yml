@@ -4,6 +4,9 @@ spring:
   config:
     import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
 
+  data:
+    mongodb:
+      uri: ${MONGO_URI_ACTIVITY:${MONGO_URI:mongodb://localhost:27017/fitness}}
   mongodb:
     uri: ${MONGO_URI_ACTIVITY:${MONGO_URI:mongodb://localhost:27017/fitness}}
 
