@@ -341,14 +341,40 @@ const DashboardLayout = ({ tokenData, logOut, onOpenProfile }) => {
                                         <IconComponent />
                                     </ListItemIcon>
                                     {!isCollapsed && (
-                                        <ListItemText
-                                            primary={item.label}
-                                            primaryTypographyProps={{ fontSize: '0.9rem', fontWeight: isSelected ? 'bold' : 'medium',  color: isSelected
-                                                ? (isAdmin ? '#c084fc' : '#ff9800')
-                                                : 'rgba(255, 255, 255, 0.9)',noWrap: true }}
-                                            secondary={item.subtitle}
-                                            secondaryTypographyProps={{ fontSize: '0.7rem', color: isSelected ? (isAdmin ? 'rgba(192, 132, 252, 0.8)' : 'rgba(255, 152, 0, 0.8)') : 'rgba(255, 255, 255, 0.4)', noWrap: true }}
-                                        />
+                                        <Box sx={{ minWidth: 0, flex: 1, overflow: 'hidden', pl: 0.5 }}>
+                                            <Typography
+                                                sx={{
+                                                    fontSize: '0.9rem',
+                                                    fontWeight: isSelected ? 700 : 600,
+                                                    color: isSelected
+                                                        ? (isAdmin ? '#c084fc' : '#ff9800')
+                                                        : '#FFFFFF',
+                                                    lineHeight: 1.25,
+                                                    whiteSpace: 'nowrap',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis'
+                                                }}
+                                            >
+                                                {item.label}
+                                            </Typography>
+                                            <Typography
+                                                sx={{
+                                                    fontSize: '0.72rem',
+                                                    fontWeight: isSelected ? 600 : 500,
+                                                    color: isSelected
+                                                        ? (isAdmin ? '#e9d5ff' : '#fed7aa')
+                                                        : '#94a3b8',
+                                                    display: 'block',
+                                                    lineHeight: 1.2,
+                                                    whiteSpace: 'nowrap',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                    mt: 0.3
+                                                }}
+                                            >
+                                                {item.subtitle}
+                                            </Typography>
+                                        </Box>
                                     )}
                                 </ListItemButton>
                             </Tooltip>
