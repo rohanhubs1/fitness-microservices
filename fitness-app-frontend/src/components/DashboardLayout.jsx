@@ -74,6 +74,9 @@ const DashboardLayout = ({ tokenData, logOut, onOpenProfile }) => {
         tokenData?.preferred_username?.toLowerCase() === 'admin'
     );
 
+    const username = tokenData?.preferred_username || tokenData?.name || (isAdmin ? 'Platform Admin' : 'Athlete');
+    const email = tokenData?.email || (isAdmin ? 'admin@pulseforge.ai' : 'user@pulseforge.ai');
+
     const navItems = isAdmin ? ADMIN_NAV_ITEMS : ATHLETE_NAV_ITEMS;
 
     // Determine active tab dynamically from the browser URL path
@@ -200,9 +203,6 @@ const DashboardLayout = ({ tokenData, logOut, onOpenProfile }) => {
         setReadNotificationIds(updated);
         localStorage.setItem(`pulseforge_read_notifications_${username}`, JSON.stringify(updated));
     };
-
-    const username = tokenData?.preferred_username || tokenData?.name || (isAdmin ? 'Platform Admin' : 'Athlete');
-    const email = tokenData?.email || (isAdmin ? 'admin@pulseforge.ai' : 'user@pulseforge.ai');
 
     const handleDrawerToggle = () => {
         if (isMobile) {
