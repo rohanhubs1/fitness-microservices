@@ -442,38 +442,47 @@ const FitnessCentres = () => {
             </Card>
 
             {/* Search, Radius & City Filter Bar */}
-            <Grid container spacing={2} sx={{ mb: 2 }}>
-                <Grid item xs={12} md={6}>
+            <Grid container spacing={2} sx={{ mb: 2 }} component="form" onSubmit={(e) => { e.preventDefault(); handleCitySearch(); }}>
+                <Grid item xs={12} md={5}>
                     <TextField
                         fullWidth
                         size="small"
                         label="Discover in City / Area"
-                        placeholder="Type city (e.g. Delhi, Mumbai, Bengaluru, London, New York)..."
+                        placeholder="Type city (e.g. Agra, Delhi, Mumbai, Bengaluru, New York)..."
                         value={cityInput}
                         onChange={(e) => setCityInput(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === 'Enter') handleCitySearch(); }}
+                        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleCitySearch(); } }}
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
                                     <LocationOnIcon color="primary" fontSize="small" />
                                 </InputAdornment>
-                            ),
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <Button
-                                        size="small"
-                                        variant="contained"
-                                        onClick={() => handleCitySearch()}
-                                        disabled={loadingLocation || !cityInput.trim()}
-                                        sx={{ textTransform: 'none', px: 2, height: 32 }}
-                                    >
-                                        Search
-                                    </Button>
-                                </InputAdornment>
                             )
                         }}
                         sx={{ bgcolor: 'white', borderRadius: 2 }}
                     />
+                </Grid>
+                <Grid item xs={12} sm={4} md={2}>
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        size="medium"
+                        onClick={() => handleCitySearch()}
+                        disabled={loadingLocation || !cityInput.trim()}
+                        startIcon={loadingLocation ? <CircularProgress size={16} color="inherit" /> : <SearchIcon />}
+                        sx={{
+                            height: 40,
+                            bgcolor: '#003566',
+                            color: '#00f2fe',
+                            fontWeight: 'bold',
+                            textTransform: 'none',
+                            borderRadius: 2,
+                            boxShadow: 2,
+                            '&:hover': { bgcolor: '#0d1b2a', color: '#fff' }
+                        }}
+                    >
+                        {loadingLocation ? 'Searching...' : '🔍 Search City'}
+                    </Button>
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
                     <TextField
@@ -518,7 +527,7 @@ const FitnessCentres = () => {
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
                     Quick Cities:
                 </Typography>
-                {['Delhi', 'Mumbai', 'Bengaluru', 'London', 'New York', 'Tokyo'].map((quickCity) => (
+                {['Agra', 'Delhi', 'Mumbai', 'Bengaluru', 'London', 'New York', 'Tokyo'].map((quickCity) => (
                     <Chip
                         key={quickCity}
                         size="small"
