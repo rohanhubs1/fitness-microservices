@@ -8,6 +8,7 @@ spring:
     uri: ${MONGO_URI_ACTIVITY:${MONGO_URI:mongodb://localhost:27017/fitness}}
 
   rabbitmq:
+    addresses: ${RABBITMQ_URL:}
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USERNAME:guest}
