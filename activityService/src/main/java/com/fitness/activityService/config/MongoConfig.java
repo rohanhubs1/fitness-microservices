@@ -16,17 +16,17 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 @Slf4j
 public class MongoConfig {
 
-    private static final String DEFAULT_ATLAS_URI =
-            "mongodb+srv://agarwalrohan2222_db_user:nahor281515139@fitnesscluster.10pwkgi.mongodb.net/fitness?appName=FitnessCluster";
+    // Credentials must come from the environment (MONGO_URI_ACTIVITY / MONGO_URI), never from source code.
+    private static final String DEFAULT_LOCAL_URI = "mongodb://localhost:27017/fitness";
 
     @Value("${spring.data.mongodb.uri:${MONGO_URI_ACTIVITY:${MONGO_URI:${SPRING_MONGODB_URI:}}}}")
     private String mongoUri;
 
     private String getEffectiveUri() {
-        if (mongoUri != null && !mongoUri.isBlank() && !mongoUri.contains("localhost")) {
+        if (mongoUri != null && !mongoUri.isBlank()) {
             return mongoUri;
         }
-        return DEFAULT_ATLAS_URI;
+        return DEFAULT_LOCAL_URI;
     }
 
     @Bean

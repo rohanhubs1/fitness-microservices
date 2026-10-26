@@ -45,6 +45,6 @@ rabbitmq:
 grok:
   api:
     url: ${GROK_API_URL:https://api.groq.com/openai/v1/chat/completions}
-    key: ${GROK_API_KEY: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}
+    key: ${GROK_API_KEY:}
     model: ${GROK_MODEL:openai/gpt-oss-20b}
 
